@@ -1,0 +1,236 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV2.xhtml">
+	
+	<ui:define name="contentV2">
+
+		<script type="text/javascript">
+			function onCompleteSave(xhr, status, args) {
+				if (!args.validationFailed) {
+					PF('dlgAdicionar').hide();
+				}
+			}
+		</script>
+		<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false"
+			life="7500" />
+		<style>
+			.ui-widget-content {
+				border: 0;
+				background-color: #f2f2f2;
+			}
+		</style>
+
+		<h1 class="">Atividades</h1>
+
+				<p:commandButton oncomplete="PF('dlgAdicionarAtiv').show();"
+					process="@this" value="ADICIONAR"
+					update="form:dlgAdicionarAtiv"
+					styleClass=""
+					actionListener="#{atividadeMB.doPrepareInsert}">
+					<p:ajaxStatus onstart="PF('status').show()"
+						onsuccess="PF('status').hide()" />
+				</p:commandButton>
+				<p:outputLabel value="Seus eventos: " />
+				<h:selectOneMenu styname="eventos" id="eventos"
+					styleClass="" label="Eventos"
+					value="#{atividadeMB.idEvento}" style="width:125px">
+					<f:ajax listener="#{atividadeMB.onEventoChange}"
+						render="" />
+					<f:selectItem itemValue="" itemLabel="Selecione um Evento"
+						noSelectionOption="true" />
+					<f:selectItems value="#{eventoMB.resultadoEvento}" var="event"
+						itemLabel="#{event.titulo}" itemValue="#{event.id}" />
+				</h:selectOneMenu>
+		
+		
+		<h:panelGroup id="tblAtiv">
+			<p:dataTable var="ativ" value="#{atividadeMB.resultadoAtividadeByEvento}" >
+				        <p:column headerText="Nome">
+				            <h:outputText value="#{even.titulo}" />
+				        </p:column>
+				        <p:column headerText="Data Inicio">
+				            <h:outputText value="#{ativ.dataInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+				        </p:column>
+				        <p:column headerText="Data Fim">
+				            <h:outputText value="#{ativ.dataInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+				        </p:column>
+				        <p:column headerText="Preço">
+				            <h:outputText value="#{ativ.preco}" />
+				        </p:column>
+				        <p:column headerText="Vagas">
+				            <h:outputText value="#{ativ.vagas}" />
+				        </p:column>
+				        <p:column headerText="Detalhes">
+				            <h:outputText value="#{ativ.detalhes}" />
+				        </p:column>
+				        <p:column headerText="Ações">
+				            <p:commandButton immediate="true" icon="ui-icon-wrench"
+								title="Editar" actionListener="#{atividadeMB.doEdit(ativ)}"
+								update=":msgs form:dlgAdicionarAtiv" process="@this"
+								oncomplete="PF('dlgAdicionarAtiv').show()">
+							</p:commandButton> 
+							<p:commandButton immediate="true" icon="ui-icon-trash"
+								title="Excluir" actionListener="#{atividadeMB.doRemove(ativ)}"
+								update=":msgs">
+								<p:confirm header="Confirmação"
+									message="Tem certeza que você quer deletar?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+				        </p:column>
+				    </p:dataTable>
+			<!--
+			<table class="table table-bordered">
+				<tr>
+					<th>Nome</th>
+					<th>Data Inicio</th>
+					<th>Data Fim</th>
+					<th>Preço</th>
+					<th>Vagas</th>
+					<th>Detalhes</th>
+					<th>Ações</th>
+				</tr>
+				<c:forEach items="#{atividadeMB.resultadoAtividadeByEvento}"
+					var="ativ">
+					<tr>
+						<td>#{ativ.nome}</td>
+						<td>
+							<h:outputText value="#{ativ.dataInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+						</td>
+						<td>
+							<h:outputText value="#{ativ.dataFim}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+						</td>
+						<td>
+							<h:outputText value="#{ativ.preco}" />
+						</td>
+						<td>
+							<h:outputText value="#{ativ.vagas}" />
+						</td>
+						<td>
+							<h:outputText value="#{ativ.detalhes}" />
+						</td>
+						<td>
+							<p:commandButton immediate="true" icon="ui-icon-wrench"
+								title="Editar" actionListener="#{atividadeMB.doEdit(ativ)}"
+								update=":msgs form:dlgAdicionarAtiv" process="@this"
+								oncomplete="PF('dlgAdicionarAtiv').show()">
+							</p:commandButton> 
+							<p:commandButton immediate="true" icon="ui-icon-trash"
+								title="Excluir" actionListener="#{atividadeMB.doRemove(ativ)}"
+								update=":msgs form:tblAtiv">
+								<p:confirm header="Confirmação"
+									message="Tem certeza que você quer deletar?"
+									icon="ui-icon-alert" />
+							</p:commandButton>
+						</td>
+					</tr>
+				</c:forEach>
+				<h:panelGroup id="tblFoster">
+				<tr id="tblFoster" style="#{atividadeMB.resultadoAtividadeByEvento eq null ? 'display:true;' : 'display:none;'}">
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+					<td>
+						<h:outputText value="sem atividade" />
+					</td>
+				</tr>
+				</h:panelGroup>
+			</table>
+			-->
+	</h:panelGroup>
+		<p:dialog widgetVar="dlgAdicionarAtiv"
+			header="#{atividadeMB.editAtividade.id eq null ? 'Adicionar nova atividade' : 'Editar atividade'}"
+			modal="true" id="dlgAdicionarAtiv">
+			
+						<h:outputText value="Nome da atividade" />
+						<h:inputText styleClass=""
+							value="#{atividadeMB.editAtividade.nome}" required="true"
+							label="Nome da atividade" />
+				
+						<h:outputText value="Data inicio" />
+						<h:inputText pt:type="date" styleClass=""
+							value="#{atividadeMB.editAtividade.dataInicio}" required="true"
+							label="Data Inicio">
+							<f:convertDateTime pattern="yyyy-MM-dd" />
+						</h:inputText>
+					
+						<h:outputText value="Data Término" />
+						<h:inputText pt:type="date" styleClass=""
+							value="#{atividadeMB.editAtividade.dataFim}" required="true"
+							label="Data Término">
+							<f:convertDateTime pattern="yyyy-MM-dd" />
+						</h:inputText>
+					
+						<h:outputText value="Hora inicio" />
+						<p:calendar pattern="HH:mm" timeOnly="true"
+							value="#{atividadeMB.editAtividade.horaInicio}" required="true"
+							label="Hora inicio" />
+					
+						<h:outputText value="Hora fim" />
+						<p:calendar pattern="HH:mm" timeOnly="true"
+							value="#{atividadeMB.editAtividade.horaFim}" required="true"
+							label="Hora fim" />
+					
+						<h:outputText value="Preço" />
+						<p:inputMask pt:type="" styleClass="" label="Preço"
+							mask="R$ 999,99" value="#{atividadeMB.editAtividade.preco}" />
+					
+						<h:outputText value="Vagas" />
+						<h:inputText pt:type="" styleClass=""
+							value="#{atividadeMB.editAtividade.vagas}" label="Vagas" />
+
+						<h:outputText value="Detalhes" />
+						<h:inputTextarea pt:type="" styleClass=""
+							value="#{atividadeMB.editAtividade.detalhes}" label="Detalhes" />
+					
+					<p:commandButton value="#{atividadeMB.editAtividade.id eq null ? 'Salvar' : 'Editar'}"
+						styleClass=""
+						actionListener="#{atividadeMB.doSave}"
+						oncomplete="onCompleteSave(xhr, status, args);" update=":msgs">
+						<p:ajaxStatus onstart="PF('status').show()"
+							onsuccess="PF('status').hide()" />
+						<f:ajax render="tblAtiv"/>
+					</p:commandButton>
+				
+		</p:dialog>
+		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+			<f:ajax render="tblAtiv">
+			<p:commandButton value="Sim" type="button" update="form:tblAtiv"
+				styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+			<p:commandButton value="Não" type="button"
+				styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</f:ajax>
+		</p:confirmDialog>
+		<p:dialog widgetVar="status" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:graphicImage name="ajaxloader.gif" library="images" />
+		</p:dialog>
+	</ui:define>
+</ui:composition>

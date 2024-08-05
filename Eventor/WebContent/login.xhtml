@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV2.xhtml">
+	<!-- propiedade templete define qual master page sera aplicada nessa pagina -->
+	
+	<!-- ui define, onde ficara todo conteudo à ser adicionado na master page (dentro do body definido na master page) -->
+	<ui:define name="contentV2">
+			<h:form class="ui-md-4">
+				<p:panel id="login" header="Iniciar sessão">
+				<h:panelGrid columns="2" cellpadding="5">
+					<p:outputLabel value="Nome de Usuario:" for="Usuario"/>
+					<p:inputText id="Usuario" value="#{userContextMB.user}"/>
+				
+					<p:outputLabel value="Senha" for="Senha"/>
+					<p:inputText id="Senha" value="#{userContextMB.password}"/>
+					
+					<p:commandButton icon="ui-icon-check" value="Entrar" actionListener="#{userContextMB.doLogin}">
+						<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+					</p:commandButton>
+				
+				</h:panelGrid>
+				</p:panel>
+			</h:form>
+	</ui:define>
+</ui:composition>

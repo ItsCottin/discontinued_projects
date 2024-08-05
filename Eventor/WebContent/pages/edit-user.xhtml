@@ -1,0 +1,51 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV2.xhtml">
+
+	<ui:define name="contentV2">
+
+					<h:outputLabel styleClass="" value="Login:" />
+					<h:inputText styleClass="" value="#{usuarioMB.editUsuario.login}" label="Login" disabled="true" />
+				
+					<h:outputLabel styleClass="" value="Nome Completo:" />
+					<h:inputText styleClass="" value="#{usuarioMB.editUsuario.nome}"
+						label="Nome Completo" />
+				
+					<h:outputLabel value="CPF:" />
+					<p:inputMask value="#{usuarioMB.editUsuario.cpfCnpj}" label="CPF/CNPJ" mask="999.999.999-99"
+						styleClass="" disabled="#{usuarioMB.editUsuario.cpfCnpj eq null ? 'false' : 'true'}" />
+					
+					<h:outputLabel value="E-mail" />
+					<h:inputText styleClass="" value="#{usuarioMB.editUsuario.email}" label="E-mail" >
+						<f:validateRegex
+							pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+					</h:inputText>
+				
+					<h:outputLabel value="Endereço:" />
+					<h:inputText styleClass="" value="#{usuarioMB.editUsuario.endereco}" label="Endereço" />
+				
+						<h:outputLabel value="Senha Atual:" />
+						<h:inputText styleClass="" value="#{usuarioMB.editUsuario.oldsenha}"
+							label="Senha Atual" />
+					
+						<h:outputLabel value="Nova Senha:" />
+						<p:password id="senha" match="senha2" styleClass="" value="#{usuarioMB.editUsuario.senha}"
+							label="Nova Senha:" />
+					
+						<h:outputLabel value="Confirmar nova senha:" />
+						<p:password id="senha2" styleClass="" value="#{usuarioMB.editUsuario.confirmSenha}"
+							label="Confirmar nova senha" />
+							
+					<h:outputLabel value="Telefone" />
+					<p:inputMask pt:type="" styleClass="" label="Telefone"
+						mask="(999)99999-9999" value="#{usuarioMB.editUsuario.telefone}" />
+				
+					<p:commandButton actionListener="#{usuarioMB.doEdit}" value="Salvar" process="@this" />
+				
+	</ui:define>
+</ui:composition>

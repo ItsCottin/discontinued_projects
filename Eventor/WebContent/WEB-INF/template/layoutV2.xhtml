@@ -1,0 +1,70 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:head>
+		<f:facet name="first">
+			<meta charset="UTF-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1" />
+		</f:facet>
+
+		<title>Eventor</title>
+
+		<h:outputStylesheet library="styles" name="custom.css" />
+		<!--  <h:outputStylesheet library="javascripts" name="app.css" />
+
+		<h:outputScript target="body" library="primefaces" name="jquery/jquery.js" />
+		<h:outputScript target="body" library="javascripts" name="app.js" />-->
+		<h:outputScript target="body" library="javascripts" name="i18n.min.js" />
+	</h:head>
+
+	<h:body>
+
+		<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false"
+			life="100000" />
+
+    	<p:growl id="messages"/>
+    	<h:form>	
+    		<p:menubar>
+    			
+    			<p:menuitem value="Inicio" url="index.xhtml" 
+    				rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" />
+		        <p:submenu label="Evento" icon="ui-icon-document"
+		        	rendered="#{userContextMB.logado eq false ? 'false' : 'true'}">
+		            <p:menuitem value="Gerenciar" url="Evento.xhtml" />
+		        </p:submenu>
+		        <p:menuitem value="Atividades" url="atividades.xhtml" icon="ui-icon-document" 
+		        	rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"/>
+		        <p:menuitem value="Participantes" url="participantes.xhtml" icon="ui-icon-document" 
+		        	rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"/>
+		        <p:menuitem value="Inscritos" url="inscricoes.xhtml" icon="ui-icon-document" 
+		        	rendered="#{userContextMB.logado eq false ? 'false' : 'true'}"/>
+		        <p:submenu label="Configuração" icon="ui-icon-document" 
+		        	rendered="#{userContextMB.logado eq false ? 'false' : 'true'}">
+		        	<p:menuitem value="Informações do Usuario" url="edit-user.xhtml" />
+		        	<p:menuitem value="Conta" url="#" />
+		        </p:submenu>
+		        <f:facet name="options"
+		        	rendered="#{userContextMB.logado eq false ? 'false' : 'true'}">
+		            <h:outputLink value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+							<h:outputText value="Sair" />
+					</h:outputLink>
+        		</f:facet>
+			</p:menubar>
+		</h:form>
+		<p:dialog widgetVar="status" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:graphicImage name="ajaxloader.gif" library="images" />
+		</p:dialog>
+		
+		
+			<section class="">
+			<h:form id="form">
+				<ui:insert name="contentV2" />
+			</h:form>
+			</section>
+	</h:body>
+
+</ui:composition>

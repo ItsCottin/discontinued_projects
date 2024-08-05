@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<f:facet name="first">
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+	</f:facet>
+
+	<title>Login</title>
+
+	<h:outputStylesheet library="css" name="bootstrap.min.css" />
+	<h:outputStylesheet library="styles" name="components.css" />
+</h:head>
+
+<h:body style="background:#EDF1FA">
+	<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false"
+		life="7500" />
+	<div class="container">
+		<div class="row main">
+			<div class="panel-heading">
+				<div class="panel-title text-center">
+					<h1 class="title">Gerenciador de eventos</h1>
+					<hr />
+				</div>
+			</div>
+			<div class="main-login main-center">
+				<h:form styleClass="form-horizontal">
+
+					<div class="form-group">
+						<label for="name" class="cols-sm-2 control-label">Nome</label>
+						<div class="cols-sm-10">
+
+							<h:inputText label="Nome" type="text" styleClass="form-control"
+								required="true" name="name" id="name"
+								value="#{usuarioMB.editUsuario.nome}" />
+
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="email" class="cols-sm-2 control-label">E-mail</label>
+						<div class="cols-sm-10">
+							<h:inputText label="E-mail" required="true" type="text" class="form-control" 
+							name="email" id="email" value="#{usuarioMB.editUsuario.email}"  >
+								<f:validateRegex
+								pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+							</h:inputText>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="username" class="cols-sm-2 control-label">Nome
+							de usuário</label>
+						<div class="cols-sm-10">
+
+							<h:inputText type="text" styleClass="form-control" name="username"
+								id="username" value="#{usuarioMB.editUsuario.login}" required="true" label="nome do usuario" />
+
+						</div>
+					</div>
+					
+
+					<div class="form-group">
+						<label for="password" class="cols-sm-2 control-label">Senha</label>
+						<div class="cols-sm-10">
+							<p:password id="senha" value="#{usuarioMB.editUsuario.senha}" 
+										match="senha2" label="Senha" required="true" />
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="confirm" class="cols-sm-2 control-label">Confirmar
+							senha</label>
+						<div class="cols-sm-10">
+							
+							<p:password id="senha2" 
+										value="#{usuarioMB.editUsuario.confirmSenha}" 
+										label="Confirmar senha" 
+										required="true" />
+
+						</div>
+					</div>
+
+					<div class="form-group ">
+						<p:commandButton styleClass="btn btn-primary btn-lg btn-block login-button" 
+							update=":msgs" actionListener="#{usuarioMB.doSave}" value="Cadastrar" >
+							<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+						</p:commandButton>
+					</div>
+					<div class="login-register">
+						<a href="login.xhtml">Já é cadastrado?</a>
+					</div>
+				</h:form>
+			</div>
+		</div>
+	</div>
+	<p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+    	<p:graphicImage name="ajaxloader.gif" library="images" />
+	</p:dialog>
+</h:body>
+
+</html>

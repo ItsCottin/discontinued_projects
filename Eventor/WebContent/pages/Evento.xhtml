@@ -1,0 +1,295 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV2.xhtml">
+	
+	<ui:define name="contentV2">
+		
+		<script type="text/javascript">
+			function onCompleteSave(xhr, status, args) {
+				if (!args.validationFailed) {
+					PF('dlgAdicionarEven').hide();
+				}
+			}
+		</script>
+		
+		<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false"
+			life="7500" />
+		
+		<p:tabView dynamic="true" id="tabGerenc">
+			<p:tab title="Gerenciar" id="gerenc">
+				<h1 class="">Evento</h1>
+				<p:separator style="width:99%;" />
+				<p:commandButton oncomplete="PF('dlgAdicionarEven').show();"
+					value="ADICIONAR" process="@this" update=""
+					styleClass="" actionListener="#{eventoMB.doPrepareInsert}" >
+					<p:ajaxStatus onstart="PF('status').show()"
+						onsuccess="PF('status').hide()" />
+				</p:commandButton>
+				<h:panelGroup id="tblEven">
+					<p:dataTable var="even" value="#{eventoMB.resultadoEvento}" >
+				        <p:column headerText="Título">
+				            <h:outputText value="#{even.titulo}" />
+				        </p:column>
+				        <p:column headerText="Data">
+				            <h:outputText value="#{even.dataInicio}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+				        </p:column>
+				        <p:column headerText="Estado">
+				            <h:outputText value="#{even.estado}" />
+				        </p:column>
+				        <p:column headerText="Cidade">
+				            <h:outputText value="#{even.cidade}" />
+				        </p:column>
+				        <p:column headerText="Preço">
+				            <h:outputText value="#{even.preco}" />
+				        </p:column>
+				        <p:column headerText="Vaga">
+				            <h:outputText value="#{even.vaga}" />
+				        </p:column>
+				        <p:column headerText="Ações">
+				            <p:commandButton immediate="true"
+								icon="ui-icon-wrench" title="Editar"
+								actionListener="#{eventoMB.doEdit(even)}" update=":msgs"
+								process="@this" oncomplete="PF('dlgAdicionarEven').show()">
+							</p:commandButton>
+							<p:commandButton immediate="true" icon="ui-icon-trash"
+								title="Excluir" actionListener="#{eventoMB.doRemove(even)}"
+								update=":msgs">
+								<p:confirm header="Confirmação"
+									message="Tem certeza que você quer deletar?"
+									icon="ui-icon-alert" />
+									<f:ajax render="tblEven" />
+							</p:commandButton>
+				        </p:column>
+				    </p:dataTable>
+				    </h:panelGroup>
+				</p:tab>
+				<p:tab title="Vizualizar">
+					<h:form>
+						<h:panelGrid columnClasses="value">
+							<h3 style="margin-top: 0">Seu Calendário</h3>
+							<p:schedule id="schedule" value="#{eventoMB.eventModel}"
+								widgetVar="myschedule" timeZone="GMT+2">
+
+								<p:ajax event="dateSelect"
+									listener="#{eventoMB.onDateSelect}" update="form:dlgAdicionarEven"
+									oncomplete="PF('dlgAdicionarEven').show();" />
+								<p:ajax event="eventSelect"
+									listener="#{eventoMB.onEventSelect}" update="form:dlgAdicionarEven"
+									oncomplete="PF('dlgAdicionarEven').show();" />
+								<p:ajax event="eventMove" listener="#{eventoMB.onEventMove}"
+									update="" />
+								<p:ajax event="eventResize"
+									listener="#{eventoMB.onEventResize}" update="" />
+
+							</p:schedule>
+						</h:panelGrid>
+
+						<p:dialog widgetVar="eventDialog" header="Event Details"
+							showEffect="clip" hideEffect="clip">
+							<h:panelGrid id="eventDetails" columns="2">
+								<p:outputLabel for="title" value="Titles:" />
+								<p:inputText id="title" value="#{eventoMB.event.title}"
+									required="true" />
+
+								<p:outputLabel for="from" value="From:" />
+								<p:calendar id="from" value="#{eventoMB.event.startDate}"
+									timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" />
+
+								<p:outputLabel for="to" value="To:" />
+								<p:calendar id="to" value="#{eventoMB.event.endDate}"
+									timeZone="GMT+2" pattern="dd/MM/yyyy HH:mm" />
+
+								<p:outputLabel for="allDay" value="All Day:" />
+								<h:selectBooleanCheckbox id="allDay"
+									value="#{eventoMB.event.allDay}" />
+
+								<p:commandButton type="reset" value="Reset" />
+								<p:commandButton id="addButton" value="Save"
+									actionListener="#{eventoMB.addEvent}"
+									oncomplete="PF('myschedule').update();PF('eventDialog').hide();" />
+							</h:panelGrid>
+						</p:dialog>
+					</h:form>
+
+					<script type="text/javascript">
+						PrimeFaces.locales['tr'] = {
+							closeText : 'kapat',
+							prevText : 'geri',
+							nextText : 'ileri',
+							currentText : 'bugün',
+							monthNames : [ 'Ocak', 'Şubat', 'Mart', 'Nisan',
+									'Mayıs', 'Haziran', 'Temmuz', 'Ağustos',
+									'Eylül', 'Ekim', 'Kasım', 'Aralık' ],
+							monthNamesShort : [ 'Oca', 'Şub', 'Mar', 'Nis',
+									'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki',
+									'Kas', 'Ara' ],
+							dayNames : [ 'Pazar', 'Pazartesi', 'Salı',
+									'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi' ],
+							dayNamesShort : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe',
+									'Cu', 'Ct' ],
+							dayNamesMin : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu',
+									'Ct' ],
+							weekHeader : 'Hf',
+							firstDay : 1,
+							isRTL : false,
+							showMonthAfterYear : false,
+							yearSuffix : '',
+							month : 'Ay',
+							week : 'Hafta',
+							day : 'Gün',
+							allDayText : 'Tüm Gün'
+						};
+					</script>
+					<style type="text/css">
+					.value {
+						width: 1000px;
+					}
+					</style>
+				</p:tab>
+			</p:tabView>
+		
+		<p:dialog widgetVar="dlgAdicionarEven"
+			header="#{eventoMB.editEvento.id eq null ? 'Adicionar novo evento' : 'Editar evento'}"
+			modal="true" id="dlgAdicionarEven" styleClass="">
+			<p:panel id="pnlGridEven">
+				<p:panelGrid columns="3" layout="grid">
+							<h:outputText value="Titulo do evento" />
+							<h:inputText label="Titulo do evento" pt:type="text"
+								styleClass="" value="#{eventoMB.editEvento.titulo}"
+								required="true" />
+								
+							<h:outputText value="Data inicio" />
+							<h:inputText pt:type="date" label="Data inicio"
+								styleClass=""
+								value="#{eventoMB.editEvento.dataInicio}" required="true"
+								id="dataInicio">
+								<f:convertDateTime pattern="yyyy-MM-dd" />
+							</h:inputText>
+							
+							<h:outputText value="Data fim" />
+							<h:inputText pt:type="date" label="Data fim"
+								styleClass="" value="#{eventoMB.editEvento.dataFim}"
+								required="true">
+								<f:convertDateTime pattern="yyyy-MM-dd" />
+							</h:inputText>
+
+							<h:outputText value="Hora inicio" />
+							<p:calendar pattern="HH:mm" timeOnly="true"
+								value="#{eventoMB.editEvento.horaInicio}" required="true"
+								label="Hora inicio" />
+
+							<h:outputText value="Hora fim" />
+							<p:calendar pattern="HH:mm" timeOnly="true"
+								value="#{eventoMB.editEvento.horaFim}" required="true"
+								label="Hora fim" />
+
+							<h:outputText value="Site do evento" />
+							<h:inputText styleClass="form-control"
+								value="#{eventoMB.editEvento.site}"
+								disabled="#{eventoMB.editEvento.siteProprio}"
+								label="site do evento" id="cbxSiteProprio" />
+
+						<p class="">.eventor.com.br</p>
+
+							<p:selectBooleanCheckbox
+									value="#{eventoMB.editEvento.siteProprio}">
+									<p:ajax event="change" update="cbxSiteProprio" />
+							</p:selectBooleanCheckbox> 
+							<h:outputText value="utilizar site fornecido pelo geventor." />
+
+							<h:outputText value="Local" />
+							<h:inputText pt:type="" required="true" styleClass=""
+								value="#{eventoMB.editEvento.local}" label="Local" />
+
+							<h:outputText value="Estado" />
+							<h:selectOneMenu styleClass="" styname="uf"
+								id="uf" required="true" value="#{eventoMB.editEvento.estado}"
+								label="Estado">
+								<f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
+								<f:selectItem itemValue="" itemLabel="Selecione um Estado"
+									noSelectionOption="true" />
+								<f:selectItems value="#{eventoMB.estados}" var="est"
+									itemLabel="#{est.uf}" itemValue="#{est.uf}" />
+							</h:selectOneMenu>
+
+							<h:outputText value="Cidade" />
+							<h:selectOneMenu required="true" styleClass=""
+								value="#{eventoMB.editEvento.cidade}" label="Cidade"
+								id="cidades">
+								<f:selectItem itemValue="" itemLabel="Selecione uma cidade"
+									noSelectionOption="true" />
+								<f:selectItems value="#{eventoMB.cidades}" var="cid"
+									itemLabel="#{cid.name}" itemValue="#{cid.name}" />
+							</h:selectOneMenu>
+
+							<h:outputText value="Email" />
+							<h:inputText styleClass=""
+								value="#{eventoMB.editEvento.email}" id="email"
+								validatorMessage="formato de email inválido" label="E-mail">
+								<f:validateRegex
+									pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+							</h:inputText>
+
+							<h:outputText value="Telefone" />
+							<p:inputMask pt:type="" styleClass=""
+								label="Telefone" mask="(999)99999-9999"
+								value="#{eventoMB.editEvento.telefone}" />
+
+							<h:outputText value="Preço" />
+							<p:inputMask pt:type="" styleClass="" label="Preço"
+								mask="R$ 999,99" value="#{eventoMB.editEvento.preco}" />
+
+							<h:outputText value="Vagas" />
+							<h:inputText pt:type="" styleClass=""
+								value="#{eventoMB.editEvento.vagas}" label="Vagas" />
+
+								<h:outputText value="Descrição" />
+								<p:inputTextarea rows="5" cols="100" counter="display"
+									maxlength="250" counterTemplate="{0} caracteres restantes."
+									autoResize="false" value="#{eventoMB.editEvento.descricao}"
+									label="Descrição" />
+								<h:inputText pt:type="" styleClass="" /> 
+
+								<h:outputText id="display" />
+
+						<f:facet name="footer">
+					
+							<p:commandButton
+								value="#{eventoMB.editEvento.id eq null ? 'Criar evento' : 'Editar evento'}"
+								id="btnEdit" styleClass="btn btn-primary"
+								actionListener="#{eventoMB.doSave}"
+								oncomplete="onCompleteSave(xhr, status, args);" update=":msgs">
+								<p:ajaxStatus onstart="PF('status').show()"
+									onsuccess="PF('status').hide()" />
+								<f:ajax render="tblEven" />
+							</p:commandButton>
+
+						</f:facet>
+				</p:panelGrid>
+			</p:panel>
+		</p:dialog>
+		<p:dialog widgetVar="status" modal="true" draggable="false"
+			closable="false" resizable="false" showHeader="false">
+			<p:graphicImage name="ajaxloader.gif" library="images" />
+		</p:dialog>
+		<p:ajaxStatus onstart="PF('status').show()"
+			onsuccess="PF('status').hide()" />
+
+		<p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+			<f:ajax render="">
+				<p:commandButton value="Sim" type="button" update="form:tblEven"
+					styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+				<p:commandButton value="Não" type="button"
+					styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+			</f:ajax>
+		</p:confirmDialog> 
+		
+	</ui:define>
+</ui:composition>
