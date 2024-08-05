@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+   xmlns:p="http://primefaces.org/ui"
+   xmlns:c="http://java.sun.com/jsp/jstl/core"
+   template="/WEB-INF/template/layoutV3.xhtml">
+   <ui:define name="contentV3">
+      <ul class="nav-tab nav">
+         <li class="nav-tab-item active">
+            <a data-tab="tab-1" data-toggle="tab" class="nav-tab-link nav-link tab active" aria-controls="home" aria-current="page" href="#resumo">Resumo</a>
+         </li>
+         <li class="nav-tab-item">
+         	<a data-tab="tab-2" data-toggle="tab" class="nav-tab-link nav-link tab" aria-controls="home" aria-current="page" href="#maisiformacoes">Informações</a>
+         </li>
+      </ul>
+      
+      <div class="tab-content">
+         <div role="tabpanel" class="tab-pane active" id="resumo">
+            <div class="jumbotron m-4 shadow">
+               <h1 class="display-4">Olá, mundo!</h1>
+               <p class="lead">Este sistema é um simples sistema de CRUD com algumas tabelas relacionadas desenvolvido em Java para o TCC de 2017 na ETEC Prof. Horacio Augusto da Silveira localizada na Vila Guilherme</p>
+               <hr class="my-4"/>
+               <p>Este sistema utiliza varias bibliotecas javas, para mais informações sobre esse sistema clique na aba "Mais Informações"</p>
+            </div>
+            <div class="container-fluid">
+                     <p:panel styleClass="shadow no-border-rcf" id="timeLineEvent" header="Todos seus eventos em time line">
+                        <h:panelGrid styleClass="no-border-rcf no-shadow-rcf" columns="1" cellpadding="9" style="width: 100%;">
+                           <h:form>
+                              <p:growl id="msgs" showDetail="false" autoUpdate="true"
+                                 sticky="false" life="7500" />
+                                 <p:timeline id="timeline" value="#{basicTimelineView.model}"
+                                    height="250px" selectable="#{basicTimelineView.selectable}"
+                                    zoomable="#{basicTimelineView.zoomable}"
+                                    moveable="#{basicTimelineView.moveable}"
+                                    stackEvents="#{basicTimelineView.stackEvents}"
+                                    axisOnTop="#{basicTimelineView.axisOnTop}"
+                                    eventStyle="#{basicTimelineView.eventStyle}"
+                                    showCurrentTime="#{basicTimelineView.showCurrentTime}"
+                                    showNavigation="#{basicTimelineView.showNavigation}">
+                                    <p:ajax event="select" listener="#{basicTimelineView.onSelect}" />
+                                 </p:timeline>
+                           </h:form>
+                        </h:panelGrid>
+                     </p:panel>
+            </div>
+         </div>
+         <div id="maisiformacoes" class="tab-pane fade">
+            <div class="jumbotron shadow my-4">
+                  <h3 class="display-11">Mais informações sobre o sistema abaixo</h3>
+                  <hr class="my-4"/>
+                  <h3 class="display-11">Participantes do projeto:</h3>
+                  <p>Rodrigo Cotting Fontes como programador backend e managedBean</p>
+                  <p>Thalita Oliveira de Carvalho como programadora FrontEnd e WebDesign</p>
+                  <p>Laercio Alves como Analista de Projetos</p>
+                  <p>Giovani Santos como Analista de Projetos</p>
+                  <hr class="my-4"/>
+                  <h3 class="display-11">Bibliotecas utilizadas no projeto:</h3>
+                  <p>Primefaces v6.0</p>
+                  <p>Bootstrap v4.6</p>
+                  <p>SpringFramework Security v3.1.4</p>
+                  <p>SpringFramework Data v1.1.2</p>
+                  <p>Hibernate Core v3.6.0</p>
+                  <p>Lombok</p>
+                  <p>javassist v3.9.0</p>
+                  <p>groovy</p>
+                  <p>jsf v2.2.9</p>
+                  <p>javax</p>
+            </div>
+         </div>
+      </div>
+   </ui:define>
+</ui:composition>

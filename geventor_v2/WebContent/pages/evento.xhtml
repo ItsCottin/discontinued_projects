@@ -1,0 +1,618 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:ui="http://java.sun.com/jsf/facelets"
+   xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+   xmlns:p="http://primefaces.org/ui"
+   xmlns:c="http://java.sun.com/jsp/jstl/core"
+   xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+   template="/WEB-INF/template/layoutV3.xhtml">
+   <ui:define name="contentV3">
+      <h:outputScript library="js" name="evento.js" />
+      
+      <ul class="nav-tab nav my-3">
+         <li class="nav-tab-item">
+            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab" href="#gerenciar">Gerenciar</a>
+         </li>
+         <li class="nav-tab-item active">
+            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#disponiveis">Todos</a>
+         </li>
+      </ul>
+      <div class="tab-content py-4">
+         <div id="gerenciar" class="tab-pane">
+            <ul class="nav-tab nav">
+               <li class="nav-tab-item active">
+                  <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#visualizar">Visualizar</a>
+               </li>
+               <li class="nav-tab-item">
+                  <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab" href="#adicionareditar">Adicionar</a>
+               </li>
+            </ul>
+            <div class="tab-content py-4">
+               <div id="visualizar" class="tab-pane active">
+               	  <div class="form-group">
+                  	<h3 class="">Eventos</h3>
+                  </div>
+                  <h:form id="formtbl">
+                  	<div class="${fn:length(eventoMB.resultadoEvento) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+                  	<c:choose>
+		             <c:when test="${fn:length(eventoMB.resultadoEvento) > 0}">
+						<div class="row">
+							<c:forEach var="even" items="#{eventoMB.resultadoEvento}" step="1" begin="0">
+								<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+									<div class="card no-border-rcf shadow ui-card-rcf">
+										<div class="row">
+											<div data-label="Título" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												#{even.titulo}
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Data" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												#{eventoMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'dd/MM'})} às #{eventoMB.formatarDataFromTela({'data': even.dataInicio, 'formato': 'HH:mm'})} 
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Duração" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<c:set var="difDate" value="#{eventoMB.getDifDateFromTela({'datainicio': even.dataInicio, 'datafim': even.dataFim})}" />
+												#{difDate.valor} #{difDate.unidade}
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Custo" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												#{even.vlr} 
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Configurar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<p:commandButton immediate="true" id="btnConNew_#{even.id}"
+				                                    icon="ui-icon-search" title="Consultar"
+				                                    actionListener="#{eventoMB.doConsulta({'evento': even, 'request': 'tabela'})}" update=":formEvent"
+				                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+				                                 </p:commandButton>
+				                                 <p:commandButton immediate="true" id="btnEditNew_#{even.id}"
+				                                    icon="ui-icon-wrench" title="Editar"
+				                                    actionListener="#{eventoMB.doEdit(even)}" update=":formEvent"
+				                                    process="@this" oncomplete="selAbaEdit('nao')" styleClass="ui-icon-button-rcf">
+				                                 </p:commandButton>
+				                                 <p:commandButton immediate="true" icon="ui-icon-trash" id="btnExcNew_#{even.id}"
+				                                    title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{eventoMB.doPrepareDel(even)}"
+				                                    update=":msgs, formModalDel" styleClass="ui-icon-button-rcf" /> 
+											</div>
+										</div>
+									</div>
+								</div>
+							</c:forEach>
+						</div>
+		              </c:when>
+		              <c:otherwise>
+		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+							Você não tem nenhum Evento cadastrado, cadastre um evento na Aba de 'Adicionar'.
+						</div>
+				      </c:otherwise>
+					</c:choose>
+					</div>
+                  </h:form>
+                  
+                  
+                  	<!-- Modal de confirmação de exclusão -->
+                  	<div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+					   <div class="modal-dialog" role="document">
+					      <div class="modal-content">
+					     	 <h:form id="formModalDel" styleClass="ui-margin-bottom-0-rcf">
+					             <div class="modal-header bg-light ">
+									<div class="d-flex align-items-start flex-column form-control bg-light no-border-rcf">
+										<h5 class="modal-title" id="exampleModalLabel">Confirmar</h5>
+									</div>	
+					             </div>
+					             <div class="modal-body">
+					             	
+					             		<c:choose>
+					             			<c:when test="#{eventoMB.editEvento.existeInscrito}">
+					             				<div class="alert alert-warning ui-margin-bottom-0-rcf" role="alert">
+													Não é possivel excluir esse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
+												</div>
+					             			</c:when>
+					             			<c:otherwise>
+					             				<div class="border-rcf">
+					                               <label>Deseja realmente excluir o evento <strong>'#{eventoMB.editEvento.titulo}'</strong> ?</label>
+					                               <c:if test="${fn:length(eventoMB.editEvento.atividades) > 0}">
+					 									<label>Todas as atividades abaixo também serão <strong class="text-danger">apagadas!</strong> </label>
+													</c:if>
+												</div>
+					                            <ul class="list-group first-init-reply">
+					                            	<c:forEach var="ativ" items="#{eventoMB.editEvento.atividades}" step="1" begin="0">
+					                            		<li class="list-group-item list-group-item-ajust-rcf"><strong>Nome:</strong> #{ativ.nome}</li>
+					                            	</c:forEach>
+					                            </ul>
+					                        </c:otherwise>
+										</c:choose>
+					             </div>
+					             <div class="modal-footer">
+					                <p:commandButton styleClass="btn btn-secundary ui-widget-button-outline-secondary-rcf" value="#{eventoMB.editEvento.existeInscrito ? 'Fechar' : 'Não'}"
+						                onstart="closeModal('newConfirmDel')"
+						                actionListener="#{eventoMB.doPrepareSave()}" update=":msgs :formtbl" />
+					                <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+					                   rendered="#{eventoMB.editEvento.existeInscrito ? 'false' : 'true'}"
+					                   actionListener="#{eventoMB.doRemove(eventoMB.editEvento)}" update=":msgs :formtbl"  >
+					                   <p:ajax onstart="closeModal('newConfirmDel')" />
+					                </p:commandButton>	                                                
+					             </div>
+					         </h:form>
+					      </div>
+					   </div>
+					</div>
+               </div>
+               
+               <div id="adicionareditar" class="tab-pane">
+                  <div class="col-md-12">
+                     <h:form id="formEvent">
+                     	<div class="form-group">
+                        	<h3 class="">#{eventoMB.editEvento.id eq null ? 'Adicionar Evento' : (eventoMB.modoConsulta ? 'Consultando o Evento' : 'Editar Evento')}</h3>
+                        </div>
+                        <p:panelGrid rendered="#{eventoMB.editEvento.existeInscrito ? (eventoMB.editEvento.doEditEven eq 'true' ? 'true' : 'false') : 'false'}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Não é possivel realizar alteração nesse Evento, existem atividades vinculadas com inscritos Aprovados ou Pendentes
+								</div>
+		                    </div>
+	                    </p:panelGrid>
+                        <div class="col-md-12 col-lg-12">
+                        	<c:if test="${fn:length(eventoMB.resultadoAtividadeByEvento) > 0}">
+							<div class="row mb-3">
+								<c:forEach var="ativ" items="#{eventoMB.resultadoAtividadeByEvento}" step="1" begin="0">
+									<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+										<div class="card no-border-rcf shadow ui-card-rcf">
+											<div class="row">
+												<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.nome}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Vagas" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.vagas - ativ.qtdInscrito}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Configurar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<div class="btn-group" role="group" aria-label="Basic example">
+				                                       <p:commandButton immediate="true" id="consultar_#{ativ.id}"
+				                                          icon="ui-icon-search" title="Consultar"
+				                                          actionListener="#{eventoMB.doConsultaAtiv(ativ)}" update=":formHtmlModal"
+				                                          process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf">
+				                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+				                                       </p:commandButton>
+				                                       <p:commandButton immediate="true" id="increver_#{ativ.id}"
+				                                          icon="#{ativ.estaInscrito eq 'True' ? 'ui-icon-check' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'ui-icon-closethick' : 'ui-icon-plus')}" title="#{ativ.estaInscrito eq 'True' ? 'Você já está inscrito' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever')}" 
+				                                          value="#{ativ.vagas - ativ.qtdInscrito eq 0 ? 'Sem vaga' : 'Inscrever'}" disabled="#{ativ.estaInscrito ? 'true' : (ativ.vagas - ativ.qtdInscrito eq 0 ? 'true' : 'false')}"
+				                                          actionListener="#{eventoMB.doIncrever(ativ)}" update=":formEvent"
+				                                          process="@this" oncomplete="" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf">
+				                                          <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+				                                       </p:commandButton>
+			                                       </div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</c:forEach>
+							</div>  
+                           </c:if>
+                           <div class="row mb-3 border-rcf pt-4 bg-white shadow">
+                           	<div class="col-lg-2 col-md-2 col-sm-2 col-small-3-rcf form-group text-right text-truncate">
+                              	<label for="titulo" class="col-form-label">Título:</label>
+                             </div>
+                              <div class="col-lg-6 col-md-6 col-sm-5 col-small-9-rcf form-group">
+                                 <p:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="titulo" 
+                                 	value="#{eventoMB.editEvento.titulo}" label="Nome" required="true" disabled="#{eventoMB.modoConsulta}" />
+                              </div>
+                              <div class="col-lg-2 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
+                                 <label for="vagas" class="col-form-label">Vagas:</label>
+                              </div>
+                              <div class="col-lg-2 col-md-2 col-sm-3 col-small-8-rcf form-group">
+                                 <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="vagas" disabled="#{eventoMB.modoConsulta}"
+                                    value="#{eventoMB.editEvento.vagas}" label="Vagas" required="true" >
+                                    <p:ajax event="blur" update="vagas" listener="#{eventoMB.validaVagasDoEditEven}" />
+                                 </h:inputText>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-4 col-small-4-rcf form-group text-right text-truncate">
+                                 <label for="from" class="col-form-label">Começa:</label>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-8 col-small-8-rcf form-group">
+                                 <p:inputMask mask="99/99/9999 99:99" label="Data inicio"
+                                    styleClass="form-control ui-width-100-rcf #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
+                                    value="#{eventoMB.editEvento.dataInicio}" required="true"
+                                    id="dataInicio" placeholder="Data inicio">
+                                    <p:ajax event="blur" listener="#{eventoMB.validarDatasEvento}" update="datafim, dataInicio" />
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="UTC"/>
+                                 </p:inputMask>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-4 form-group col-small-4-rcf text-right text-truncate">
+                                 <label for="datafim" class="col-form-label">Termina:</label>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-8 form-group col-small-8-rcf">
+                                 <p:inputMask mask="99/99/9999 99:99" label="Data Fim" 
+                                    styleClass="form-control ui-width-100-rcf #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{eventoMB.modoConsulta}" 
+                                    value="#{eventoMB.editEvento.dataFim}" required="true"
+                                    id="datafim" placeholder="Data inicio">
+                                    <p:ajax event="blur" listener="#{eventoMB.validarDatasEvento}" update="datafim, dataInicio" />
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="UTC"/>
+                                 </p:inputMask>
+                              </div>
+                           		<div class="col-lg-6 col-md-6 col-sm-7 col-small-12-rcf form-group input-group">
+                                 <div class="input-group-prepend bg-light border border-light">
+                                    <div class="input-group-text">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
+                                          value="#{eventoMB.editEvento.usaMyEndereco}" id="usaMyEndereco">
+                                          <p:ajax event="change" update="cep, uf, cidades, numero, local, bairro, usaMyEndereco" listener="#{eventoMB.onChangeMyEndereco}" />
+                                       </h:selectBooleanCheckbox>
+                                    </div>
+                                 </div>
+                                 <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+                                    value="utilizar meu endereço?" disabled="true" />
+                              </div>
+                              
+                              <div class="col-lg-2 col-md-2 col-sm-1 col-small-4-rcf form-group text-right">
+		                          <label for="cep" class="col-form-label">CEP:</label>
+		                      </div>
+		                      <div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
+		                          <p:inputMask value="#{eventoMB.editEvento.cep}" label="cep" mask="99999-999"
+										styleClass="form-control ui-width-100-rcf #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'border border-info bg-white')}" 
+										disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" id="cep">
+										<p:ajax event="blur" listener="#{eventoMB.findEnderecoByCEP()}" update="uf, cidades, numero, local, bairro, usaMyEndereco"/>
+								</p:inputMask>
+		                      </div>
+                              <div class="col-lg-4 col-md-6 col-sm-6 col-small-12-rcf form-group">
+                                 <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" styname="uf"
+                                    id="uf" required="true" value="#{eventoMB.editEvento.estado}"
+                                    label="Estado" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" >
+                                    <f:ajax listener="#{eventoMB.onEstadoChange}" render="cidades" />
+                                    <f:selectItem itemValue="" itemLabel="Selecione um Estado"
+                                       noSelectionOption="true" />
+                                    <f:selectItems value="#{eventoMB.estados}" var="est"
+                                       itemLabel="#{est.uf}" itemValue="#{est.uf}" />
+                                 </h:selectOneMenu>
+                              </div>
+                              <div class="col-lg-4 col-md-6 col-sm-6 col-small-12-rcf form-group">
+                                 <h:selectOneMenu required="true" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}"
+                                    value="#{eventoMB.editEvento.cidade}" label="Cidade"
+                                    id="cidades" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" >
+                                    <p:ajax update="cidades" listener="#{eventoMB.validaDDDAfterSelCidade}" />
+                                    <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
+                                       noSelectionOption="true" />
+                                    <f:selectItems value="#{eventoMB.cidades}" var="cid"
+                                       itemLabel="#{cid.name}" itemValue="#{cid.name}" />
+                                 </h:selectOneMenu>
+                              </div>
+                              <div class="col-lg-2 col-md-2 col-sm-2 col-small-4-rcf form-group text-right">
+		                            <label for="numero" class="col-form-label">Número:</label>
+		                        </div>
+		                        <div class="col-lg-2 col-md-4 col-sm-4 col-small-8-rcf form-group">
+		                            <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="numero" value="#{eventoMB.editEvento.numeroLugar}" label="Número"
+		                            	disabled="#{eventoMB.modoConsulta}" />
+		                        </div>
+                              <div class="col-lg-2 col-md-2 col-sm-2 col-small-4-rcf form-group text-right">
+                                 <label for="endereco" class="col-form-label">Endereço:</label>
+                              </div>
+                              <div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
+                                 <h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" id="local" value="#{eventoMB.editEvento.endereco}" label="endereco" required="true"
+                                    disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" />
+                              </div>
+                              
+		                        <div class="col-lg-2 col-md-2 col-sm-2 col-small-4-rcf form-group text-right">
+	                            	<label for="bairro" class="col-form-label">Bairro:</label>
+	                        	</div>
+	                        	<div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
+	                            	<h:inputText class="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.cepvalidoinformado ? 'bg-light border border-light' : 'bg-white')}" id="bairro" 
+	                            	value="#{eventoMB.editEvento.bairro}" label="Bairro" disabled="#{eventoMB.modoConsulta ? 'true' : (eventoMB.cepvalidoinformado ? 'true' : 'false')}" />
+	                        	</div>
+	                        	<div class="col-lg-0 col-md-6 col-sm-6 col-small-8-rcf form-group">
+	                        	</div>
+	                           	<div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">
+	                                <div class="input-group-prepend bg-light border border-light">
+	                                    <div class="input-group-text">
+	                                       <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
+	                                          value="#{eventoMB.editEvento.usaMyTelefone}" id="checkboxUsaMyTelefone">
+	                                          <p:ajax event="change" update="celular, email, checkboxUsaMyTelefone" listener="#{eventoMB.onChangeMyTelefone}" />
+	                                       </h:selectBooleanCheckbox>
+	                                    </div>
+	                                 </div>
+	                                 <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+	                                    value="utilizar meu Telefone?" disabled="true" />
+	                            </div>
+		                        <div class="col-md-3 col-sm-6 col-small-6-rcf form-group text-right text-truncate">
+		                            <label for="atualizarsenha" class="col-form-label">Telefone ou Celular?</label>
+		                        </div>
+		                        <div class="col-md-3 col-sm-6 col-small-6-rcf form-group">
+		                            <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+		                                value="#{eventoMB.usaTelefone}" label="Telefone ou Celular?"
+		                                id="telefonecelular" disabled="#{eventoMB.modoConsulta}" >
+		                                <p:ajax  update="celular" event="change" listener="#{eventoMB.onChangeMyTelefone}" />
+		                                <f:selectItem itemValue="Telefone" itemLabel="Telefone"
+		                                    noSelectionOption="true" />
+		                                <f:selectItem itemValue="Celular" itemLabel="Celular"
+		                                  	noSelectionOption="true" />
+		                            </h:selectOneMenu>
+		                        </div>
+		                        <div class="col-md-2 col-sm-4 col-small-4-rcf form-group text-right">
+                                 <label for="email" class="col-form-label">E-mail:</label>
+                              </div>
+                              <div class="col-md-5 col-sm-8 col-small-8-rcf form-group">
+                                 <h:inputText styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.usaMyTelefone eq false ? 'bg-white' : 'bg-light border border-light')}" 
+                                 	disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.usaMyTelefone eq false ? 'false' : 'true')}" value="#{eventoMB.editEvento.email}" id="email"
+                                    validatorMessage="formato de email inválido" label="E-mail">
+                                    <f:validateRegex
+                                       pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                                 </h:inputText>
+                              </div>
+                              	<div class="col-md-2 col-sm-4 col-small-4-rcf form-group text-right">
+                            		<label for="celular" class="col-form-label">#{eventoMB.usaTelefone}:</label>
+		                        </div>
+		                        <div class="col-md-3 col-sm-5 col-small-8-rcf form-group">
+		                            <p:inputMask pt:type="" styleClass="form-control ui-width-100-rcf #{eventoMB.modoConsulta ? 'bg-light border border-light' : (eventoMB.editEvento.usaMyTelefone eq false ? 'bg-white' : 'bg-light border border-light')}" id="celular"
+		                                    label="Celular" mask="#{eventoMB.maskTelefone}" disabled="#{eventoMB.modoConsulta eq true ? 'true' : (eventoMB.editEvento.usaMyTelefone eq false ? 'false' : 'true')}"
+		                                    value="#{eventoMB.editEvento.telefone}" >
+		                                <p:ajax event="blur" listener="#{eventoMB.validaDDD(eventoMB.editEvento.telefone)}" update="celular"/>
+		                            </p:inputMask>
+		                        </div>
+                           	<div class="col-md-6 col-sm-12 form-group input-group">
+                                 <div class="input-group-prepend bg-light border border-light">
+                                    <div class="input-group-text">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{eventoMB.modoConsulta}" 
+                                          value="#{eventoMB.editEvento.siteProprio}">
+                                          <p:ajax event="change" update="cbxSiteProprio" listener="#{eventoMB.onChangeUtilizarSite}" />
+                                       </h:selectBooleanCheckbox>
+                                    </div>
+                                 </div>
+                                 <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+                                    value="utilizar site fornecido pelo geventor." disabled="true" />
+                              </div>
+                           	<div class="col-md-6 col-sm-12 form-group">
+                                 <h:inputText styleClass="form-control #{eventoMB.editEvento.siteProprio ? 'bg-light border border-light' : (eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white')}" placeholder="Site proprio do Evento"
+                                    value="#{eventoMB.editEvento.site}" 
+                                    disabled="#{eventoMB.editEvento.siteProprio or eventoMB.modoConsulta}"
+                                    label="site do evento" id="cbxSiteProprio" />
+                              </div>
+                              
+                             
+	                              
+	                              <div class="col-md-3 col-sm-6 col-small-6-rcf form-group text-right text-truncate">
+		                            	<label for="evenpago" class="col-form-label">Evento Pago?</label>
+				                   </div>
+				                   <div class="col-md-3 col-sm-6 col-small-6-rcf form-group">
+				                            <h:selectOneMenu styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+				                                value="#{eventoMB.editEvento.vlr}" label="Evento pago?"
+				                                id="evenpago" disabled="#{eventoMB.modoConsulta}" >
+				                                <p:ajax event="change" listener="#{eventoMB.onChangePrecoEven}" />
+				                                <f:selectItem itemValue="Pago" itemLabel="Pago"
+				                                    noSelectionOption="true" />
+				                                <f:selectItem itemValue="Gratuito" itemLabel="Gratuito"
+				                                  	noSelectionOption="true" />
+				                            </h:selectOneMenu>
+				                        </div>
+                              <div class="col-sm-12 form-group">
+                                 <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Descrição do Evento"
+                                    maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{eventoMB.modoConsulta}"
+                                    autoResize="false" value="#{eventoMB.editEvento.descricao}"
+                                    label="Descrição" styleClass="form-control #{eventoMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" />
+                              </div>
+	                              <div class="col-sm-12 form-group mt-3">
+	                                 <div class="btn-group" role="group" aria-label="Basic example">
+	                                    <p:commandButton rendered="#{!eventoMB.modoConsulta}"
+	                                       value="#{eventoMB.editEvento.id eq null ? 'Cadastra Evento' : 'Salvar Alterações'}"
+	                                       id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
+	                                       actionListener="#{eventoMB.doSave(true)}" update=":formtbl :formEvent, modalConfirmEdit" >
+	                                       <p:ajaxStatus onstart="PF('status').show()" />
+	                                       <f:ajax render="tblEven" />
+	                                    </p:commandButton>
+	                                    <p:commandButton rendered="#{eventoMB.editEvento.id eq null ? 'false' : 'true'}"
+	                                       value="#{eventoMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
+	                                       id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
+	                                       actionListener="#{eventoMB.doPrepareSave}" update=":formEvent, formTodosEven"
+	                                       oncomplete="selAbaTbl();"  >
+	                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                                       <f:ajax render="tblEven" />
+	                                    </p:commandButton>
+	                                 </div>
+	                              </div>
+                           </div>
+                           
+                             
+                        </div>
+                     </h:form>
+                     
+                     <!-- modal consulta atividade -->
+					 <div class="modal fade" id="modalConsAtividade" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+					   <div class="modal-dialog modal-xl" role="document">
+					      <div class="modal-content">
+					      	<h:form id="formHtmlModal">
+					         <div class="modal-header bg-light">
+					         	<div class="col-md-12 col-lg-12">
+						           <ul class="list-group first-init-reply">
+						              <li class="list-group-item list-group-item-ajust-rcf bg-light">
+						               	<h5 class="modal-title" id="exampleModalLabel">Atividade: #{eventoMB.atividade.nome}</h5>
+						              </li>
+						           </ul>
+						            
+					            </div>
+					         </div>
+					         <div class="modal-body">
+					            <div class="col-md-12 col-lg-12">
+					              	<ul class="list-group first-init-reply">
+					              		<li class="list-group-item list-group-item-ajust-rcf"><strong>Evento:</strong> #{eventoMB.atividade.evento.titulo}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Detalhes da Atividade:</strong> #{eventoMB.atividade.detalhes}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Começa:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.atividade.dataInicio, 'formato': 'dd/MM'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.atividade.dataInicio, 'formato': 'HH:mm'})}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Termina:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.atividade.dataFim, 'formato': 'dd/MM'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.atividade.dataFim, 'formato': 'HH:mm'})}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Preço:</strong> #{eventoMB.atividade.preco}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Vagas:</strong> #{eventoMB.atividade.vagas - eventoMB.atividade.qtdInscrito} de #{eventoMB.atividade.vagas}</li>
+									</ul>
+					             </div>
+					         </div>
+					         </h:form>
+					         <div class="modal-footer bg-light">
+					             <div class="d-flex align-items-end flex-column">
+							         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+							     </div>
+							 </div>
+					      </div>
+					   </div>
+					</div>
+						
+					<!-- modal confirmação edição -->
+					 <div class="modal fade" id="modalEditAtiv" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="modalConfirmEdit" styleClass="ui-margin-bottom-0-rcf">
+						         <div class="modal-header bg-light">
+						            <h5 class="modal-title" id="exampleModalLabel">Confirmação</h5>
+						            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						               <span aria-hidden="true"></span>
+						             </button>
+						         </div>
+						         <div class="modal-body">
+						         	<div class="row">
+		                                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+		                                	<div class="alert alert-warning" role="alert">
+							                    <strong>Evento:</strong> '#{eventoMB.editEvento.titulo}'<br />
+										  		<strong>Atenção!</strong> todas as atividades listadas abaixo com datas marcadas de <strong class="text-danger">vermelho</strong> terão o periodo atualizado!
+									  		</div>
+										</div>
+										<div class="form-group col-lg-12 col-md-12 col-sm-12">
+											<h5 class="modal-title" id="exampleModalLabel">Periodo antes da alteração: </h5>
+										</div>
+										<div class="form-group col-lg-12 col-md-12 col-sm-12">
+											<ul class="list-group">
+						                        <c:forEach var="ativ" items="#{eventoMB.editEvento.atividades}" step="1" begin="0">
+						                            <li class="list-group-item">
+						                            	<div class="row">
+						                            	<div class="form-group col-lg-12 col-md-12 col-sm-12">
+						                            		<strong>Nome:</strong> #{ativ.nome}
+						                            	</div>
+						                            	<div class="form-group col-lg-6 col-md-12 col-sm-12">
+					                                 		<label class="form-control bg-light border #{ativ.foraPeriodoInicio ? 'border-danger' : 'border-light'}" id="infoInicioEven">
+					                                 			<strong>Inicio:</strong> #{eventoMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+					                                 		</label>
+					                              		</div>
+					                              		<div class="form-group col-lg-6 col-md-12 col-sm-12">
+					                                 		<label class="form-control bg-light border #{ativ.foraPeriodoFim ? 'border-danger' : 'border-light'}" id="infoInicioEven">
+					                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': ativ.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': ativ.dataFim, 'formato': 'HH:mm'})}
+					                                 		</label>
+					                              		</div>
+					                              		</div>
+						                            </li>
+						                         </c:forEach>
+						                     </ul>
+					                     </div>
+										<div class="form-group col-lg-12 col-md-12 col-sm-12">
+											<h5 class="modal-title" id="exampleModalLabel">Periodo à ser utilizado: </h5>
+										</div>
+										<div class="form-group col-lg-6 col-md-12 col-sm-12">
+	                                 		<label class="form-control bg-light border border-light" id="infoInicioEven">
+	                                 			<strong>Inicio:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataInicio, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataInicio, 'formato': 'HH:mm'})}
+	                                 		</label>
+	                              		</div>
+	                              		<div class="form-group col-lg-6 col-md-12 col-sm-12">
+	                                 		<label class="form-control bg-light border border-light" id="infoInicioEven">
+	                                 			<strong>Fim:</strong> #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'dd/MM/yyyy'})} às #{eventoMB.formatarDataFromTela({'data': eventoMB.editEvento.dataFim, 'formato': 'HH:mm'})}
+	                                 		</label>
+	                              		</div>
+		                               </div>
+	                               </div>
+	                               <div class="modal-footer bg-light">
+	                                  <button type="button" class="btn" data-dismiss="modal">Cancelar</button>
+	                                  <p:commandButton styleClass="btn btn-success ui-widget-button-success-rcf" value="Confirmar" 
+	                                      onstart="closeModal('modalEditAtiv')" actionListener="#{eventoMB.doSavePopUp()}" update=":msgs :formtbl" />
+	                                </div>
+						         </h:form>
+						      </div>
+						   </div>
+						</div>	
+						
+                     <script type="text/javascript">
+                        PrimeFaces.locales['tr'] = {
+                        	closeText : 'kapat',
+                        	prevText : 'geri',
+                        	nextText : 'ileri',
+                        	currentText : 'bugün',
+                        	monthNames : [ 'Ocak', 'Şubat', 'Mart', 'Nisan',
+                        			'Mayıs', 'Haziran', 'Temmuz', 'Ağustos',
+                        			'Eylül', 'Ekim', 'Kasım', 'Aralık' ],
+                        	monthNamesShort : [ 'Oca', 'Şub', 'Mar', 'Nis',
+                        			'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki',
+                        			'Kas', 'Ara' ],
+                        	dayNames : [ 'Pazar', 'Pazartesi', 'Salı',
+                        			'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi' ],
+                        	dayNamesShort : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe',
+                        			'Cu', 'Ct' ],
+                        	dayNamesMin : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu',
+                        			'Ct' ],
+                        	weekHeader : 'Hf',
+                        	firstDay : 0,
+                        	isRTL : false,
+                        	showMonthAfterYear : false,
+                        	yearSuffix : '',
+                        	month : 'Ay',
+                        	week : 'Hafta',
+                        	day : 'Gün',
+                        	allDayText : 'Tüm Gün'
+                        };
+                     </script>
+                     <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="ajaxloader.gif" library="images" />
+                     </p:dialog>
+                     <p:ajaxStatus onstart="PF('status').show()"
+                        onsuccess="PF('status').hide()" />
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div id="disponiveis" class="tab-pane active">
+         	<div class="form-group">
+            	<h3>Eventos Disponíveis</h3>
+            </div>
+            <h:form id="formTodosEven">
+            	
+               <div class="row ${fn:length(eventoMB.allEvenMenosMeus) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+               
+               <c:choose>
+	             <c:when test="${fn:length(eventoMB.allEvenMenosMeus) > 0}">
+	               <c:forEach var="event" items="#{eventoMB.allEvenMenosMeus}" step="1" begin="0">
+	                  <div class="col-xd-4 col-md-4 col-sm-6 mt-4">
+	                     <div class="card no-border-rcf shadow">
+	                        <div class="card-header no-border-rcf">
+	                           <a href="#{event.site}" target="_blank"><span class="ui-button-text">#{event.titulo}</span></a>
+	                        </div>
+	                        <div class="card-body no-border-rcf">
+						        	<ul class="list-group first-init-reply ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+						            	<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Descrição:</strong> #{event.descricao}</li>
+						            	<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Data:</strong> #{eventoMB.formatarDataFromTela({'data': event.dataInicio, 'formato': 'dd/MM'})} às #{eventoMB.formatarDataFromTela({'data': event.dataInicio, 'formato': 'HH:mm'})}</li>
+										<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Vagas:</strong> #{event.vagas - event.qtdInscrito} de #{event.vagas}</li>
+									</ul>
+	                           
+								<p:commandButton immediate="true" id="cardConsEvent_#{event.id}" value="Inscrever"
+	                                  actionListener="#{eventoMB.doConsulta({'evento': event, 'request': 'card'})}" update=":formEvent" 
+	                                  process="@this" styleClass="btn btn-primary ui-widget-button-primary-rcf" oncomplete="selAbaEdit('sim')">
+	                                  <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                            </p:commandButton>
+	                        </div>
+	                        <div class="card-footer no-border-rcf text-muted">
+	                           #{event.qtdDifTemp eq 0 ? 'Pouco' : event.qtdDifTemp} #{event.qtdDifTemp eq 0 ? 'tempo' : (event.qtdDifTemp eq 1 ? 'minuto' : event.tpDifTemp)} atrás
+	                        </div>
+	                     </div>
+	                  </div>
+	                 </c:forEach>
+	              </c:when>
+	              <c:otherwise>
+	                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+						Não existe nenhum Evento disponível para se Increver.
+					</div>
+			      </c:otherwise>
+				</c:choose>
+               
+               
+               
+               </div>
+               
+            </h:form>
+         </div>
+      </div>
+   </ui:define>
+</ui:composition>

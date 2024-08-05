@@ -1,0 +1,289 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV3.xhtml">
+
+	<ui:define name="contentV3">
+		<script type="text/javascript">
+			function closeModalAlterAvatar() {
+                $('#alteravatar').modal('hide');
+            }
+	</script>
+<div class="container bootstrap snippet">
+    <div class="row">
+  		<div class="col-sm-12">
+  			<h1 class="text-center">Seu usuário</h1>
+  		</div>
+    </div>
+    <div class="row">
+  		<div class="col-md-3 mt-3"><!--left col-->
+	      <div class="text-center">
+	      	<h:form id="avatar" class="shadow bg-white">
+		      	<a data-toggle="modal" data-target="#alteravatar" class="no-border-rcf">
+		      		<h:graphicImage library="perfil" name="#{usuarioMB.editUsuario.avatar}" styleClass="avatar img-circle img-thumbnail" />
+		        </a>
+	        </h:form>
+	        <h6>Escolha seu Avatar</h6>
+	      </div>
+	      <br />
+          <ul class="list-group shadow no-border-rcf">
+            <li class="list-group-item no-border-rcf text-muted">Informações <i class="fa fa-dashboard fa-1x"></i></li>
+            <li class="list-group-item no-border-rcf text-right"><span class="pull-left"><strong>Inscrições:</strong></span> <span class="badge badge-secondary">#{usuarioMB.myinscricoes}</span></li>
+            <li class="list-group-item no-border-rcf text-right"><span class="pull-left"><strong>Eventos:</strong></span> <span class="badge badge-secondary">#{usuarioMB.myeventos}</span></li>
+            <li class="list-group-item no-border-rcf text-right"><span class="pull-left"><strong>Inscritos Pen:</strong></span> <span class="badge badge-secondary">#{usuarioMB.inscritospen}</span></li>
+            <li class="list-group-item no-border-rcf text-right"><span class="pull-left"><strong>Prox Evento:</strong></span> #{usuarioMB.proxevent}</li>
+          </ul>
+        </div><!--/col-3-->
+    	<div class="col-md-9 mt-3">
+          <div class="tab-content">
+            <div class="tab-pane active" id="home">
+                  <h:form class="form" id="formUsuario">
+                  	<div class="row mb-3 border-rcf shadow bg-white">
+                    	<div class="col-sm-4 col-small-5-rcf form-group text-right text-truncate">
+                        	<label for="nome" class="col-form-label">Nome Completo:</label>
+                        </div>
+                        <div class="col-sm-8 col-small-7-rcf form-group">
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="nome" value="#{usuarioMB.editUsuario.nome}" label="nome" required="true"
+                            	disabled="#{usuarioMB.modoConsulta}" />
+                        </div>
+                        <div class="col-sm-4 col-small-4-rcf form-group text-right text-truncate">
+                            <label for="login" class="col-form-label">Nome de Login:</label>
+                        </div>
+                        <div class="col-sm-8 col-small-8-rcf form-group input-group">
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="login" 
+                            	value="#{usuarioMB.editUsuario.login}" label="login" required="true" disabled="#{usuarioMB.modoConsulta}" >
+                            	<p:ajax event="blur" listener="#{usuarioMB.verificaAlterLogin(usuarioMB.editUsuario.login)}" update="formUsuario"/>
+                            </h:inputText>
+                            <div class="input-group-append">
+                            	<h:commandButton value="#{usuarioMB.editUsuario.loginVerificado eq 'false' ? 'Verificar' : 'Verificado'}" styleClass="btn btn-outline-secondary ui-widget-button-secundary-rcf text-truncate" 
+                            		actionListener="#{usuarioMB.verificaLoginExiste()}" disabled="#{usuarioMB.editUsuario.loginVerificado}" update="formUsuario">
+                            		<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+                            	</h:commandButton>
+                            </div>
+                        </div>
+                    	<div class="col-sm-1 col-md-1 col-lg-2 col-small-4-rcf form-group text-right">
+                        	<label for="cpf" class="col-form-label">CPF:</label>
+                        </div>
+                        <div class="col-sm-4 col-md-4 col-lg-3 col-small-8-rcf form-group">
+                            <p:inputMask value="#{usuarioMB.editUsuario.cpfCnpj}" label="cpf" mask="999.999.999-99"
+								styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{usuarioMB.modoConsulta}" >
+								<p:ajax event="blur" listener="#{usuarioMB.validaCPFTab(usuarioMB.editUsuario.cpfCnpj)}" update="formUsuario"/>
+							</p:inputMask> <!-- #{usuarioMB.editUsuario.cpfCnpj eq null ? 'false' : 'true'} -->
+                        </div>
+                        <div class="col-sm-2 col-small-4-rcf form-group text-right">
+                            <label for="email" class="col-form-label">E-mail:</label>
+                        </div>
+                        <div class="col-sm-5 col-small-8-rcf form-group">
+                            <h:inputText styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" disabled="#{usuarioMB.modoConsulta}"
+                                    value="#{usuarioMB.editUsuario.email}" id="email" required="true"
+                                    validatorMessage="formato de email inválido" label="E-mail">
+                                <f:validateRegex
+                                       pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                             </h:inputText>
+                        </div>
+                        <div class="col-sm-1 col-md-1 col-lg-2 col-small-4-rcf form-group text-right">
+                            <label for="cep" class="col-form-label">CEP:</label>
+                        </div>
+                        <div class="col-sm-4 col-md-4 col-lg-3 col-small-8-rcf form-group">
+                            <p:inputMask value="#{usuarioMB.cepInformado}" label="cep" mask="99999-999"
+								styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'border border-info bg-white'}" 
+								disabled="#{usuarioMB.modoConsulta}">
+								<p:ajax event="blur" listener="#{usuarioMB.findEnderecoByCEP()}" update="formUsuario"/>
+							</p:inputMask>
+                        </div>
+                        <div class="col-sm-2 col-small-4-rcf form-group text-right">
+                            <label for="bairro" class="col-form-label">Bairro:</label>
+                        </div>
+                        <div class="col-sm-5 col-small-8-rcf form-group">
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}" id="bairro" 
+                            	value="#{usuarioMB.editUsuario.bairro}" label="Bairro" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" />
+                        </div>
+                        <div class="col-sm-6 col-small-12-rcf form-group">
+                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}" styname="uf"
+                                id="uf" value="#{usuarioMB.editUsuario.estado}"
+                                label="Estado" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" >
+                                <p:ajax listener="#{usuarioMB.onEstadoChange}" render="cidades" update="formUsuario" />
+                                <f:selectItem itemValue="" itemLabel="Selecione um Estado"
+                                    noSelectionOption="true" />
+                                <f:selectItems value="#{usuarioMB.estados}" var="est"
+                                    itemLabel="#{est.uf}" itemValue="#{est.uf}" />
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="col-sm-6 col-small-12-rcf form-group">
+                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}"
+                                value="#{usuarioMB.editUsuario.cidade}" label="Cidade"
+                                id="cidades" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" >
+                                <p:ajax update="formUsuario" listener="#{usuarioMB.validaDDDAfterSelCidade}" />
+                                <f:selectItem itemValue="" itemLabel="Selecione uma Cidade"
+                                    noSelectionOption="true" />
+                                <f:selectItems value="#{usuarioMB.cidades}" var="cid"
+                                    itemLabel="#{cid.name}" itemValue="#{cid.name}" />
+                            </h:selectOneMenu>
+                        </div>
+                        
+                        <div class="col-sm-2 col-small-4-rcf form-group text-right">
+                            <label for="endereco" class="col-form-label">Endereço:</label>
+                        </div>
+                        <div class="col-sm-4 col-small-8-rcf form-group">
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : (usuarioMB.cepInformado eq null ? 'bg-white' : 'bg-light border border-light')}" id="endereco" 
+                            	value="#{usuarioMB.editUsuario.endereco}" label="Endereço" disabled="#{usuarioMB.modoConsulta eq true ? 'true' : (usuarioMB.cepInformado eq null ? 'false' : 'true')}" />
+                        </div>
+                        <div class="col-sm-2 col-small-5-rcf form-group text-right">
+                            <label for="celular" class="col-form-label">Celular:</label>
+                        </div>
+                        <div class="col-sm-4 col-small-7-rcf form-group">
+                            <p:inputMask pt:type="" styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="celular"
+                                    label="Celular" mask="(99) 99999-9999" disabled="#{usuarioMB.modoConsulta}"
+                                    value="#{usuarioMB.editUsuario.celular}" >
+                                    <p:ajax event="blur" listener="#{usuarioMB.validaDDD(usuarioMB.editUsuario.celular)}" update="formUsuario"/>
+                            </p:inputMask>
+                        </div>
+                        <div class="col-sm-2 col-small-5-rcf form-group text-right">
+                            <label for="numero" class="col-form-label">Número:</label>
+                        </div>
+                        <div class="col-sm-4 col-small-7-rcf form-group">
+                            <h:inputText class="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="numero" value="#{usuarioMB.editUsuario.nrCasa}" label="Número"
+                            	disabled="#{usuarioMB.modoConsulta}" />
+                        </div>
+                        <div class="col-sm-2 col-small-5-rcf form-group text-right">
+                            <label for="telefone" class="col-form-label">Telefone:</label>
+                        </div>
+                        <div class="col-sm-4 col-small-7-rcf form-group">
+                            <p:inputMask pt:type="" styleClass="form-control ui-width-100-rcf #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="telefone"
+                                    label="Telefone" mask="(99) 9999-9999" disabled="#{usuarioMB.modoConsulta}"
+                                    value="#{usuarioMB.editUsuario.telefone}" >
+                                 <p:ajax event="blur" listener="#{usuarioMB.validaDDD(usuarioMB.editUsuario.telefone)}" update="formUsuario"/>
+                             </p:inputMask>
+                        </div>
+                    </div>
+                    <div class="row mb-3 border-rcf shadow bg-white">
+                    	<div class="col-sm-4 col-md-3 col-small-6-rcf form-group text-right text-truncate">
+                            <label for="atualizarsenha" class="col-form-label">Atualizar Senha?</label>
+                        </div>
+                        <div class="col-sm-4 col-md-3 col-small-6-rcf form-group">
+                            <h:selectOneMenu styleClass="form-control #{usuarioMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}"
+                                value="#{usuarioMB.editUsuario.atualizaSenha}" label="Atualiza Senha"
+                                id="atualizasenha" disabled="#{usuarioMB.modoConsulta}" >
+                                <p:ajax  update=":formUsuario"/>
+                                <f:selectItem itemValue="S" itemLabel="Sim"
+                                    noSelectionOption="true" />
+                                <f:selectItem itemValue="N" itemLabel="Não"
+                                  	noSelectionOption="true" />
+                            </h:selectOneMenu>
+                        </div>
+                        <div class="col-sm-4 col-md-3 col-md-3 col-lg-0"></div>
+                        
+                        <div class="col-sm-5 col-md-6 col-small-6-rcf col-lg-3 form-group text-right">
+                            <label for="senhaatual" class="col-form-label">Senha Atual:</label>
+                        </div>
+                        <div class="col-sm-7 col-md-6 col-small-6-rcf col-lg-3 form-group">
+                            <h:inputText class="form-control #{usuarioMB.editUsuario.atualizaSenha eq 'N' ? 'bg-light border border-light' : 'bg-white'}" id="senhaatual" value="#{usuarioMB.editUsuario.oldsenha}" label="Senha Atual"
+                            	disabled="#{usuarioMB.editUsuario.atualizaSenha eq 'S' ? 'false' : 'true'}" />
+                        </div>
+                        <div class="col-sm-5 col-md-6 col-small-6-rcf col-lg-3 form-group text-right">
+                            <label for="senha" class="col-form-label">Nova Senha:</label>
+                        </div>
+                        <div class="col-sm-7 col-md-6 col-small-6-rcf col-lg-3 form-group">
+                            <p:password class="form-control #{usuarioMB.editUsuario.atualizaSenha eq 'N' ? 'bg-light border border-light' : 'bg-white'}" id="senha" value="#{usuarioMB.editUsuario.senha}" label="Nova Senha"
+                            	disabled="#{usuarioMB.editUsuario.atualizaSenha eq 'S' ? 'false' : 'true'}" />
+                        </div>
+                        <div class="col-sm-5 col-md-6 col-small-6-rcf col-lg-3 col-xl-3 form-group text-right text-truncate">
+                            <label for="senha2" class="col-form-label">Confirmar nova senha:</label>
+                        </div>
+                        <div class="col-sm-7 col-md-6 col-small-6-rcf col-lg-3 col-xl-3 form-group">
+                            <p:password class="form-control #{usuarioMB.editUsuario.atualizaSenha eq 'N' ? 'bg-light border border-light' : 'bg-white'}" id="senha2" value="#{usuarioMB.editUsuario.confirmSenha}" label="Confirmar nova senha"
+                            	disabled="#{usuarioMB.editUsuario.atualizaSenha eq 'S' ? 'false' : 'true'}" />
+                        </div>
+                     </div>   
+                    
+                    <div class="row border-rcf shadow bg-white">   
+                        <div class="col-12">
+                            <div class="btn-group" role="group" aria-label="Basic example">
+                                    <p:commandButton rendered="#{usuarioMB.modoConsulta eq true ? 'false' : 'true'}"
+                                       value="Salvar" actionListener="#{usuarioMB.doEdit()}"
+                                       id="btnSalva" styleClass="btn btn-success ui-widget-button-success-rcf"
+                                       update=":msgs, :formUsuario" >
+                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+                                    </p:commandButton>
+                                    <p:commandButton rendered="true"
+                                       value="#{usuarioMB.modoConsulta eq true ? 'Editar' : 'Cancelar'}" actionListener="#{usuarioMB.preEdit()}"
+                                       id="btnCan" styleClass="btn btn-outline-secondary ui-widget-button-outline-secondary-rcf ui-widget-button-secundary-rcf"
+                                       update="formUsuario" >
+                                       <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+                                    </p:commandButton>
+                                 </div>
+                        </div>
+                        <div class="panel panel-default col-12 mt-2">
+				            <div class="panel-heading">Data da ultima alteração: #{usuarioMB.formatarDataFromTela({'data': usuarioMB.editUsuario.dataAlter, 'formato': 'dd/MM/yyyy HH:mm'})}</div>
+				        </div>
+                    </div><!--/row border-rcf-->
+              	</h:form>
+              
+             </div><!--/tab-pane-->             
+              
+          </div><!--/tab-content-->
+
+        </div><!--/col-9-->
+    </div><!--/row-->
+    
+    	<!-- Modal de Avatares -->
+		<div class="modal fade" id="alteravatar" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-xl modal-fullscreen-rcf">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <h5 class="modal-title" id="exampleModalLabel">Escolha um Avatar</h5>
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		          <span aria-hidden="true"></span>
+		        </button>
+		      </div>
+		      <div class="modal-body">
+		      	<h:form id="alteravatar">
+		        <div class="row">
+		          <div class="col-md-2 col-sm-3 col-small-6-rcf mt-3">
+		          	<p:commandLink actionListener="#{usuarioMB.setAvatarEdit('default.png')}" onstart="closeModalAlterAvatar()" update="avatar, formUsuario">
+		          		<h:graphicImage library="perfil" name="default.png" styleClass="avatar img-circle img-thumbnail"/>
+		          	</p:commandLink>
+		          </div>
+		          <div class="col-md-2 col-sm-3 col-small-6-rcf mt-3">
+		          	<p:commandLink actionListener="#{usuarioMB.setAvatarEdit('atleta.png')}" onstart="closeModalAlterAvatar()" update="avatar, formUsuario">
+		          		<h:graphicImage library="perfil" name="atleta.png" styleClass="avatar img-circle img-thumbnail"/>
+		          	</p:commandLink>
+		          </div>
+		          <div class="col-md-2 col-sm-3 col-small-6-rcf mt-3">
+		          	<p:commandLink actionListener="#{usuarioMB.setAvatarEdit('atendimento-ao-cliente.png')}" onstart="closeModalAlterAvatar()" update="avatar, formUsuario">
+		          		<h:graphicImage library="perfil" name="atendimento-ao-cliente.png" styleClass="avatar img-circle img-thumbnail" />
+		          	</p:commandLink>
+		          </div>
+		          <div class="col-md-2 col-sm-3 col-small-6-rcf mt-3">
+		          	<p:commandLink actionListener="#{usuarioMB.setAvatarEdit('homem.png')}" onstart="closeModalAlterAvatar()" update="avatar, formUsuario">
+		          		<h:graphicImage library="perfil" name="homem.png" styleClass="avatar img-circle img-thumbnail" />
+		          	</p:commandLink>
+		          </div>
+		          <div class="col-md-2 col-sm-3 col-small-6-rcf mt-3">
+		          	<p:commandLink actionListener="#{usuarioMB.setAvatarEdit('suporte-ao-cliente.png')}" onstart="closeModalAlterAvatar()" update="avatar, formUsuario">
+		          		<h:graphicImage library="perfil" name="suporte-ao-cliente.png" styleClass="avatar img-circle img-thumbnail" />
+		          	</p:commandLink>
+		          </div>
+		          <div class="col-md-2 col-sm-3 col-small-6-rcf mt-3">
+		          	<p:commandLink actionListener="#{usuarioMB.setAvatarEdit('ganhador.png')}" onstart="closeModalAlterAvatar()" update="avatar, formUsuario">
+		          		<h:graphicImage library="perfil" name="ganhador.png" styleClass="avatar img-circle img-thumbnail" />
+		          	</p:commandLink>
+		          </div>
+		        </div>
+		        </h:form>
+		      </div>
+		      <div class="modal-footer">
+		        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+		      </div>
+		    </div>
+		  </div>
+		</div>
+    
+	</div>				
+				
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,347 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV3.xhtml">
+	
+	<ui:define name="contentV3">
+		
+		<ul class="nav nav-tab">
+	        <li class="nav-tab-item active">
+	            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#visualizar">Visualizar</a>
+	         </li>
+	         <li class="nav-tab-item">
+	            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab" href="#gerenciar">Gerenciar</a>
+	         </li>
+     	 </ul>
+     	 <div class="tab-content py-4">
+     	 	<div id="visualizar" class="tab-pane active">
+     	 		<div class="form-group">
+     	 		  	<h3 class="">Atividades</h3>
+                  </div>
+     	 		<h:form id="formtblAtiv">
+     	 		  
+                  <div class="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+                  <c:choose>
+		             <c:when test="${fn:length(atividadeMB.resultadoAtividadeByEvento) > 0}">
+						
+						<div class="row">
+								<c:forEach var="ativ" items="#{atividadeMB.resultadoAtividadeByEvento}" step="1" begin="0">
+									<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+										<div class="card no-border-rcf shadow ui-card-rcf">
+											<div class="row">
+												<div data-label="Evento" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.evento.titulo}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.nome}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Data" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'dd/MM'})} às #{atividadeMB.formatarDataFromTela({'data': ativ.dataInicio, 'formato': 'HH:mm'})}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Preço" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.preco}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Tipo" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													#{ativ.organizacao}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Gerenciar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<p:commandButton immediate="true" id="btnCon_#{ativ.id}"
+														icon="ui-icon-search" title="Consultar"
+														actionListener="#{atividadeMB.doConsulta(ativ)}" update=":formAtiv, formtblAtiv"
+														process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
+													</p:commandButton>
+						                           	<p:commandButton immediate="true" id="btnEdit_#{ativ.id}"
+														icon="ui-icon-wrench" title="Editar"
+														actionListener="#{atividadeMB.doEdit(ativ)}" update=":formAtiv, formtblAtiv"
+														process="@this" oncomplete="selAba('gerenciar')" styleClass="ui-icon-button-rcf">
+													</p:commandButton>
+													<p:commandButton immediate="true" icon="ui-icon-trash" id="btnExc_#{ativ.id}"
+														title="Excluir" oncomplete="openModal('newConfirmDel')" actionListener="#{atividadeMB.doPrepareDel(ativ)}"
+														update="formModalDel" styleClass="ui-icon-button-rcf" />
+												</div>
+											</div>
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+						
+						
+		              </c:when>
+		              <c:otherwise>
+		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+							Você não tem nenhuma Atividade cadastrada, cadastre sua primeira Atividade na aba 'Adicionar'.
+						</div>
+				      </c:otherwise>
+					</c:choose>
+                 	</div>
+                  </h:form>
+                  
+                  <!-- Modal de confirmação de Exclusão -->
+                  <div class="modal fade" id="newConfirmDel" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+				   <div class="modal-dialog" role="document">
+				      <div class="modal-content">
+				     	 <h:form id="formModalDel" styleClass="ui-margin-bottom-0-rcf">
+				             <div class="modal-header bg-light ">
+								<div class="d-flex align-items-start flex-column form-control bg-light no-border-rcf">
+									<h5 class="modal-title" id="exampleModalLabel">Confirmar</h5>
+								</div>	
+					         </div>
+				          <div class="modal-body">
+				          	<c:choose>
+				          		<c:when test="#{atividadeMB.editAtividade.existeInscrito}">
+				          			<div class="alert alert-warning ui-margin-bottom-0-rcf" role="alert">
+										Não é possivel excluir essa Atidade, existem inscritos Aprovados ou Pendentes
+									</div>
+				          		</c:when>
+				          		<c:otherwise>
+				          			<c:choose>
+				          				<c:when test="#{atividadeMB.editAtividade.organizacao eq 'Gerencia'}">
+				          					<div class="alert alert-warning ui-margin-bottom-0-rcf" role="alert">
+												Não é possível excluir essa Atividade, essa é uma Atividade de Gerencia do Evento vinculado.
+											</div>
+				          				</c:when>
+				          				<c:otherwise>
+				          					<div class="border-rcf">
+						                    	<label>Deseja realmente excluir a Atividade <strong>'#{atividadeMB.editAtividade.nome}'</strong> ?</label>
+											</div> 
+				          				</c:otherwise>
+				          			</c:choose>
+				                </c:otherwise>
+							</c:choose>
+				          </div>
+				          <div class="modal-footer bg-light">
+				             <p:commandButton styleClass="btn btn-secundary ui-widget-button-outline-secondary-rcf" value="#{atividadeMB.editAtividade.existeInscrito ? 'Fechar' : (atividadeMB.editAtividade.organizacao eq 'Gerencia' ? 'Fechar' : 'Não')}"
+				                onstart="closeModal('newConfirmDel')"
+				                actionListener="#{atividadeMB.doPrepareSave()}" update=":msgs :formtblAtiv" />
+				             <p:commandButton styleClass="btn btn-danger ui-widget-button-danger-rcf" value="Sim" 
+				                onstart="closeModal('newConfirmDel')" rendered="#{atividadeMB.editAtividade.existeInscrito ? 'false' : (atividadeMB.editAtividade.organizacao eq 'Gerencia' ? 'false' : 'true')}"
+				                actionListener="#{atividadeMB.doRemove(atividadeMB.editAtividade)}" update=":msgs :formtblAtiv" />
+				          </div>
+				         </h:form>
+				      </div>
+				   </div>
+				</div>
+                  
+                  
+     	 	</div>
+     	 	<div id="gerenciar" class="tab-pane">
+                 <h:form id="formAtiv">
+                 	<div class="form-group">
+                     	<h3 class="">#{atividadeMB.editAtividade.id eq null ? 'Adicionar Atividade' : (atividadeMB.modoConsulta ? 'Consultando a Atividade' : 'Editar Atividade')}</h3>
+                  	</div>	
+                  		<p:panelGrid rendered="#{atividadeMB.editAtividade.eventonaovigente ? (atividadeMB.editAtividade.doEditAtiv eq 'true' ? 'true' : 'false') : 'false'}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Não é possível alterar essa Atividade pois o Evento dessa Atividade não está mais vigente.
+								</div>
+		                    </div>
+	                    </p:panelGrid>
+	                    <p:panelGrid rendered="#{atividadeMB.editAtividade.existeInscrito ? (atividadeMB.editAtividade.doEditAtiv eq 'true' ? 'true' : 'false') : 'false'}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Não é possível alterar essa Atividade pois existem Inscritos 'Aprovados' ou 'Pendentes' nessa Atividade.
+								</div>
+		                    </div>
+	                    </p:panelGrid>
+	                    <p:panelGrid rendered="#{atividadeMB.editAtividade.organizacao eq 'Gerencia' ? (atividadeMB.editAtividade.doEditAtiv eq 'true' ? 'true' : 'false') : 'false'}">
+		                	<div class="col-md-12 col-lg-12">
+		                    	<div class="alert alert-warning" role="alert">
+									Não é possível alterar essa Atividade, essa é uma Atividade de Gerencia do Evento vinculado.
+								</div>
+		                    </div>
+	                    </p:panelGrid>
+	                    <div class="col-md-12 col-lg-12 d-flex justify-content-center align-items-center"> 
+	                    	<h:outputLabel styleClass="#{atividadeMB.evenSemVaga ? (atividadeMB.editAtividade.doEditAtiv eq 'alert alert-warning' ? 'alert alert-warning' : '') : ''}" id="infEvenSemVaga" 
+	                    		value="#{atividadeMB.evenSemVaga ? (atividadeMB.editAtividade.doEditAtiv eq 'Evento selecionado sem vaga disponível para cadastro de Atividades.' ? 'Evento selecionado sem vaga disponível para cadastro de Atividades.' : '') : ''}" />
+	                    </div>
+                        <div class="col-md-12 col-lg-12">
+                           <div class="row mb-3 pt-4 border-rcf bg-white shadow">
+                           		<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
+                              		<label for="titulo" class="col-form-label">Nome:</label>
+                              	</div>
+                              	<div class="col-lg-6 col-md-4 col-sm-4 col-small-8-rcf form-group">
+                                 	<h:inputText class="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" 
+                                 		id="titulo" value="#{atividadeMB.editAtividade.nome}" label="Nome" required="true" disabled="#{atividadeMB.modoConsulta}" >
+                                 		<p:ajax event="blur" listener="#{atividadeMB.setTituloAtiv}" update="titulo, infoInicioEven, infoFimEven" />
+                                 	</h:inputText>
+                              	</div>
+                              	<div class="col-lg-1 col-md-2 col-sm-2 col-small-4-rcf form-group text-right text-truncate">
+                              		<label for="eventos" class="col-form-label">Evento:</label>
+                              	</div>
+                              	<div class="col-lg-4 col-md-4 col-sm-4 col-small-8-rcf form-group">
+	                              <h:selectOneMenu styname="eventos" id="eventos" styleClass="form-control #{atividadeMB.modoConsulta ? (atividadeMB.evenSemVaga ? 'bg-white' : 'bg-light border border-light') : 'bg-white'}" label="Evento" required="true"
+											value="#{atividadeMB.idEvento}" disabled="#{atividadeMB.modoConsulta ? (atividadeMB.evenSemVaga ? 'false' : 'true') : 'false'}">
+										<p:ajax event="change" listener="#{atividadeMB.onEventoChangeV2}" update=":formtblAtiv :formAtiv"/>
+										<f:selectItem itemValue="" itemLabel="Selecione um Evento"
+											noSelectionOption="true" />
+										<f:selectItems value="#{atividadeMB.resultadoEvento}" var="event"
+											itemLabel="#{event.titulo}" itemValue="#{event.id}" />
+									</h:selectOneMenu>
+								</div>
+                            	<div class="col-lg-6 col-md-6 col-sm-12 col-small-12-rcf form-group input-group">
+                                 <div class="input-group-prepend bg-light border border-light">
+                                    <div class="input-group-text">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{atividadeMB.modoConsulta}" 
+                                          value="#{atividadeMB.editAtividade.usaPeriodoEven}" id="usaperiodoeven">
+                                          <p:ajax event="change" update="titulo, dataInicio, datafim, usaperiodoeven" listener="#{atividadeMB.onSetDataEvenNaAtiv}" />
+                                       </h:selectBooleanCheckbox>
+                                    </div>
+                                 </div>
+                                 <input type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+                                    value="utilizar periodo do Evento?" disabled="true" />
+                              </div>
+                              <div class="col-lg-6 col-md-6 form-group">
+                              
+                              </div>
+                            	<div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                 	<h:inputText class="form-control bg-light border border-light" id="infoInicioEven" label="Inicio" disabled="true"
+                                 		value="Inicio: #{atividadeMB.infoDataInicioEven}"  />
+                              	</div>
+                              	<div class="col-lg-6 col-md-6 col-sm-12 form-group">
+                                 	<h:inputText class="form-control bg-light border border-light" id="infoFimEven" label="Fim" disabled="true"
+                                 			value="Fim: #{atividadeMB.infoDataFimEven}"  />
+                              	</div>
+                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
+                                 <label for="from" class="col-form-label">Começa:</label>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
+                                 <p:inputMask mask="99/99/9999 99:99" label="Data inicio"
+                                    styleClass="form-control ui-width-100-rcf #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
+                                    disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
+                                    value="#{atividadeMB.editAtividade.dataInicio}" required="true"
+                                    id="dataInicio" placeholder="Data inicio" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="UTC"/>
+                                    <p:ajax event="blur" listener="#{atividadeMB.validaDataInicio}" update="titulo, dataInicio, datafim"/>
+                                 </p:inputMask>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-5 col-small-4-rcf form-group text-right text-truncate">
+                                 <label for="datafim" class="col-form-label">Termina:</label>
+                              </div>
+                              <div class="col-lg-3 col-md-3 col-sm-7 col-small-8-rcf form-group">
+                                 <p:inputMask mask="99/99/9999 99:99" label="Data Fim"
+                                    styleClass="form-control ui-width-100-rcf #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.usaPeriodoEven ? 'bg-light border border-light' : 'bg-white')}" 
+                                    disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.usaPeriodoEven ? 'true' : 'false')}" 
+                                    value="#{atividadeMB.editAtividade.dataFim}" required="true"
+                                    id="datafim" placeholder="Data Fim" >
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm" locale="pt_BR" timeZone="UTC" />
+                                    <p:ajax event="blur" listener="#{atividadeMB.validaDataFim}" update="titulo, dataInicio, datafim"/> 
+                                 </p:inputMask>
+                              </div>
+                              <div class="col-lg-6 col-md-6 col-sm-12 form-group input-group">
+                                 <div class="input-group-prepend bg-light border border-light">
+                                    <div class="input-group-text">
+                                       <h:selectBooleanCheckbox styleClass="" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? 'true' : 'false')}" 
+                                          value="#{atividadeMB.editAtividade.isgratuito}" id="cbxIsGratuito">
+                                          <p:ajax event="change" update="preco, vlrativ" listener="#{atividadeMB.onChangeGratuito}" />
+                                       </h:selectBooleanCheckbox>
+                                    </div>
+                                 </div>
+                                 <h:inputText type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+                                    value="Gratuito ? #{atividadeMB.editAtividade.isgratuito ? 'Sim' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? 'Sim' : 'Não')}" 
+                                    disabled="true" id="vlrativ" />
+                                 <p:inputMask pt:type="" styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : (atividadeMB.editAtividade.isgratuito ? 'bg-light border border-light' : 'bg-white')}" 
+                                 	label="Preço" id="preco"
+                                    mask="#{atividadeMB.editAtividade.isgratuito ? '' : (atividadeMB.editAtividade.evento.vlr eq 'Gratuito' ? '' : 'R$ 99,99')}" 
+                                    value="#{atividadeMB.editAtividade.preco}" disabled="#{atividadeMB.modoConsulta ? 'true' : (atividadeMB.editAtividade.isgratuito ? 'true' : 'false')}" >
+                                    <p:ajax event="blur" listener="#{atividadeMB.setPrecoAtiv}" update="preco" />
+                                 </p:inputMask>
+                              </div>
+                              	<div class="col-lg-6 col-md-6 col-sm-12 input-group form-group">
+  									<div class="input-group-prepend">
+                                 		<span class="input-group-text">Vagas:</span>
+                                 	</div>
+	                                 <h:inputText styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="vagas" disabled="#{atividadeMB.modoConsulta}"
+	                                    value="#{atividadeMB.editAtividade.vagas}" label="Vagas Disponível">
+	                                   	<p:ajax event="blur" listener="#{atividadeMB.validaInputVaga}" update="titulo, vagas, vagadisponivel"/>
+	                                 </h:inputText>
+                                </div>
+                                <div class="col-lg-6 col-md-6 form-group"> 
+                                
+                                </div>
+                                <div class="col-lg-6 col-md-6 col-sm-12 form-group">
+	                                <h:inputText type="text" class="form-control bg-light border border-light" aria-label="Text input with checkbox" 
+			                                    value="Disponível: #{atividadeMB.vagasRestant}" 
+			                                    disabled="true" id="vagadisponivel" />
+		                         </div>           
+                              <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                                 <h:inputTextarea rows="5" cols="100" counter="display" placeholder="Detalhes da Atividade"
+                                    maxlength="250" counterTemplate="{0} caracteres restantes." disabled="#{atividadeMB.modoConsulta}"
+                                    autoResize="false" value="#{atividadeMB.editAtividade.detalhes}"
+                                    label="Descrição" styleClass="form-control #{atividadeMB.modoConsulta ? 'bg-light border border-light' : 'bg-white'}" id="detalhes" >
+                                    <p:ajax event="blur" update="titulo, dataInicio, datafim, detalhes"/>
+                                 </h:inputTextarea>
+                              </div>
+                              <div class="col-sm-12 form-group mt-3">
+                              	 <div class="btn-group" role="group" aria-label="Basic example">
+	                                 <p:commandButton rendered="#{!atividadeMB.modoConsulta}"
+	                                    value="#{atividadeMB.editAtividade.id eq null ? 'Cadastra Atividade' : 'Salvar Alterações'}"
+	                                    id="btnEdit" styleClass="btn btn-success ui-widget-button-success-rcf"
+	                                    actionListener="#{atividadeMB.doSave}" update=":formtblAtiv :formAtiv" >
+	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                                    <p:ajax render="tblAtiv" update="formAtiv, formtblAtiv" />
+	                                 </p:commandButton>
+	                                 <p:commandButton rendered="#{atividadeMB.editAtividade.id eq null ? 'false' : 'true'}"
+	                                    value="#{atividadeMB.modoConsulta ? 'Voltar' : 'Cancelar'}"
+	                                    id="btnCan" styleClass="btn btn-danger ui-widget-button-danger-rcf"
+	                                    actionListener="#{atividadeMB.doPrepareSave}" update=":formtblAtiv :formAtiv"
+	                                    oncomplete="selAba('visualizar')"  >
+	                                    <p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                                    <p:ajax render="tblAtiv" update=":formtblAtiv :formAtiv" />
+	                                 </p:commandButton>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </h:form>
+                     <script type="text/javascript">
+                        PrimeFaces.locales['tr'] = {
+                        	closeText : 'kapat',
+                        	prevText : 'geri',
+                        	nextText : 'ileri',
+                        	currentText : 'bugün',
+                        	monthNames : [ 'Ocak', 'Şubat', 'Mart', 'Nisan',
+                        			'Mayıs', 'Haziran', 'Temmuz', 'Ağustos',
+                        			'Eylül', 'Ekim', 'Kasım', 'Aralık' ],
+                        	monthNamesShort : [ 'Oca', 'Şub', 'Mar', 'Nis',
+                        			'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki',
+                        			'Kas', 'Ara' ],
+                        	dayNames : [ 'Pazar', 'Pazartesi', 'Salı',
+                        			'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi' ],
+                        	dayNamesShort : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe',
+                        			'Cu', 'Ct' ],
+                        	dayNamesMin : [ 'Pz', 'Pt', 'Sa', 'Ça', 'Pe', 'Cu',
+                        			'Ct' ],
+                        	weekHeader : 'Hf',
+                        	firstDay : 1,
+                        	isRTL : false,
+                        	showMonthAfterYear : false,
+                        	yearSuffix : '',
+                        	month : 'Ay',
+                        	week : 'Hafta',
+                        	day : 'Gün',
+                        	allDayText : 'Tüm Gün'
+                        };
+                     </script>
+                     <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="ajaxloader.gif" library="images" />
+                     </p:dialog>
+                     <p:ajaxStatus onstart="PF('status').show()"
+                        onsuccess="PF('status').hide()" />
+     	 	</div>
+     	 </div>
+	</ui:define>
+</ui:composition>

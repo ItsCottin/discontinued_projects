@@ -1,0 +1,189 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+	<h:head>
+		<f:facet name="first">
+			<meta charset="UTF-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1" />
+		</f:facet>
+
+		<title>Eventor</title>
+
+		<h:outputStylesheet library="bootstrap4/styles" name="bootstrap.min.css" />
+		<h:outputScript library="bootstrap4/js" name="bootstrap.min.js" />
+		
+		
+		<h:outputStylesheet library="styles" name="customV2.css" />
+		<h:outputScript library="js" name="customV2.js" />
+	
+	</h:head>
+
+	<h:body class="bg-light">
+		
+	<div class="my-7">	
+		<p:growl id="msgs" showDetail="false" autoUpdate="true" sticky="false" life="5000" />
+	</div>
+		
+			
+		
+    <h:form id="menuForm" >		
+	    <nav class="navbar navbar-expand-lg fixed-top shadow navbar-dark navbar-offcanvas" style="background-color: #47235e;">
+	    	<div class="mr-3 #{userContextMB.logado eq true ? 'd-none d-sm-block' : ''}">
+	        	<a class="navbar-brand mr-auto">PLURI LTDA</a>
+	        </div>
+	        <p:panelGrid rendered="#{userContextMB.logado eq false ? 'false' : 'true'}">
+				<button class="navbar-toggler d-block me-3 ui-border-color-transparent" type="button" id="navToggle">
+		            <span class="navbar-toggler-icon"></span>
+		        </button>
+		        <div class="dropdown dropdown-position-initial-rcf d-block ml-4">
+		        	<h:form id="formNotif">
+						<span data-toggle="dropdown" class="no-border-rcf" aria-expanded="false">
+							<p:commandLink actionListener="#{notificacaoMB.setVisualizado}">
+								<span class="badge">
+							    <h:graphicImage library="svg" name="bell_white.svg" type="svg" style="width: 20px;" />
+							    <strong class="bg-danger text-white p-1 rounded">#{notificacaoMB.notiNaoVisu}</strong></span>
+							</p:commandLink>
+					    </span>
+					 	<div class="dropdown-menu ui-notificacao-dropdown-rcf no-border-rcf p-3">
+					 		<c:choose>
+		             			<c:when test="#{notificacaoMB.qtdNotif > 0}">
+								  	<c:forEach var="notif" items="#{notificacaoMB.getNotificacoes()}" step="1" begin="0">
+										<div class="card no-border-rcf shadow ui-card-rcf mb-3 #{notif.visualizado ? 'bg-white' : 'ui-bg-color-amarelo-claro-rcf'}">
+											<div class="row">
+												<div data-label="#{notif.tipo}:" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf">
+													#{notif.titulo}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Descrição:" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf">
+													#{notif.detalhe}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Ações:" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf">
+													<p:commandButton immediate="true" icon="ui-icon-trash" id="btn_id"
+									                	title="Excluir" actionListener="#{notificacaoMB.doRemove(notif)}"
+									                    update=":msgs, formNotif" styleClass="ui-icon-button-rcf" /> 
+												</div>
+											</div>
+										</div>
+									</c:forEach>
+									<div class="card no-border-rcf">
+										<p:commandButton immediate="true" icon="ui-icon-trash" value="Limpar" id="btn_exluirTudo" actionListener="#{notificacaoMB.doRemoveAll}"
+								        	update=":msgs, formNotif" styleClass="no-border-rcf shadow text-muted ui-widget-button-outline-secondary-rcf ui-bg-width-rcf ui-widget-button-ajust-text" />
+									</div>
+								</c:when>
+								<c:otherwise>
+					                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+										Você não tem nenhuma Notificação.
+									</div>
+						      </c:otherwise>
+							</c:choose>
+					  	</div>
+				  </h:form>
+				</div>
+	        </p:panelGrid>
+	        <p:panelGrid rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" styleClass="ui-aling-item-rigth-rcf me-3">
+	        	
+	        </p:panelGrid>
+	        <div class="ui-aling-item-left-rcf">
+	        	<h:outputLink styleClass="navbar-toggler ui-border-color-transparent d-block" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" value="#{facesContext.externalContext.requestContextPath}/j_spring_security_logout">
+					<h:outputText value="Sair" />
+				</h:outputLink>
+	        </div>
+	        
+	        <div class="navbar-collapse offcanvas-collapse">
+	            <ul class="navbar-nav mr-auto my-2">
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Inicio" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/inicio.xhtml" >
+	                    	<p:ajaxStatus onstart="PF('status').show()" onsuccess="PF('status').hide()" />
+	                    </p:link>
+	                </li>
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Eventos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/evento.xhtml" />
+	                </li>
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Atividades" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/atividade.xhtml" />
+	                </li>
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Inscritos" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/inscrito.xhtml" />
+	                </li>
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Conta" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/conta.xhtml" />
+	                </li>
+	                <li class="nav-item">
+	                    <p:link styleClass="nav-link" value="Sobre" rendered="#{userContextMB.logado eq false ? 'false' : 'true'}" outcome="/pages/sobre.xhtml" />
+	                </li>
+	            </ul>
+	        </div>
+	    </nav>
+    </h:form>
+    
+    			
+    			<div class="container my-5">
+    				<!-- modal consulta atividade -->
+					 <div class="modal fade" id="modalConsVersao" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formConsVersaoModal">
+						         <div class="modal-header bg-light">
+						            <div class="col-md-12 col-lg-12">
+						               <ul class="list-group first-init-reply">
+							               <li class="list-group-item list-group-item-ajust-rcf bg-light">
+							               	<h5 class="ui-margin-bottom-0-rcf">Novidades :)</h5>
+							               </li>
+							           </ul>
+						            </div>
+						         </div>
+						         <div class="modal-body">
+						               <div class="col-md-12 col-lg-12">
+						                  	<ul class="list-group first-init-reply">
+						                  		<li class="list-group-item list-group-item-ajust-rcf"><h5 class="mb-3">v0.3.2 Pre Final - 28 de Maio de 2023</h5></li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">1. Ajustado layout de Menu adicionando regras de exibição para o 'PLURI LTDA', removido bordas dos botões de 'Sair' e 'Menu' e adicionado novo Botão de 'Notificações'.</li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">2. Ajustado CSS para exibir corretamente os componentes PrimeFaces 'Time Line' e 'Calendário'.</li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">3. Calendário movido para 'Inicio' do sistema, e o conteúdo presente antes no 'Inicio' movido para o menu 'Sobre'.</li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">4. Realizado troca de banco de dados de 'MySQL' para 'Microsoft SQL Server' para custo benefício.</li>
+	  											<li class="list-group-item list-group-item-ajust-rcf">5. Implementado nova funcionalidade de 'Notificações'.</li>
+  											</ul>
+						               </div>
+						         </div>
+						         
+						         </h:form>
+						         <div class="modal-footer bg-light">
+						             <div class="d-flex align-items-end flex-column">
+								         <button type="button" class="btn btn-secondary" data-dismiss="modal">Legal</button>
+								     </div>
+								 </div>
+						      </div>
+						   </div>
+						</div>
+					<section class="">
+						<ui:insert name="contentV3" />
+					</section>
+				</div>
+			
+
+
+			
+			<p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+				<p:graphicImage name="ajaxloader.gif" library="images" />
+			</p:dialog>
+	<div class="row align-items-end ui-fixed-bottom-rcf nav-item">
+		<div class="ui-aling-item-left-rcf">
+			<div class="nav-link">
+	       		<a class="text-muted text-reset font-weight-lighter text-secondary">Versão:</a>
+	       		<p:commandLink class="text-muted font-weight-lighter text-secondary" value="v0.3.2" onclick="openModal('modalConsVersao')"/>
+	       		
+	       		
+	       		</div>
+	        </div>
+		</div>	
+		
+	</h:body>
+
+</ui:composition>

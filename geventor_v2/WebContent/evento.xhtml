@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+
+	<h:head>
+	    <title>Minha Página</title>
+	    <f:facet name="first">
+			<meta charset="UTF-8" />
+			<meta name="viewport" content="width=device-width, initial-scale=1" />
+		</f:facet>
+		<h:outputStylesheet library="bootstrap4/styles" name="bootstrap.min.css" />
+		<h:outputScript library="js" name="bootstrap.min.js" />
+		
+		
+		<h:outputStylesheet library="styles" name="customV2.css" />
+		<h:outputScript library="js" name="customV2.js" />
+	</h:head>
+	
+	<h:body class="bg-light">
+		<div class="container">
+			<h:form>
+				<div class="jumbotron m-4 bg-white shadow">
+			    	<div class="row">
+			    		<div class="col-xl-12 col-md-12 col-sm-12">
+							<h1 class="text-center"><strong>Evento:</strong> #{URLsharedEventMB.evento.titulo}</h1>
+						</div>
+					</div>
+					<div class="row mt-3">
+			    		<div class="col-xl-12 col-md-12 col-sm-12">
+			    			<ul class="list-group first-init-reply ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+						       	<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Descrição:</strong> #{URLsharedEventMB.evento.descricao}</li>
+								<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Custo:</strong> #{URLsharedEventMB.evento.vlr}</li>
+								<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Data:</strong> dás #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataInicio, 'formato': 'HH:mm'})} até #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'dd/MM'})} às #{URLsharedEventMB.formatarDataFromTela({'data': URLsharedEventMB.evento.dataFim, 'formato': 'HH:mm'})}</li>
+								<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Endereço:</strong> Estado: #{URLsharedEventMB.evento.estado}, Cidade: #{URLsharedEventMB.evento.cidade}, Bairro: #{URLsharedEventMB.evento.bairro}, Endereço: #{URLsharedEventMB.evento.endereco}, Numero: #{URLsharedEventMB.evento.numeroLugar}</li>
+							</ul>
+			    		</div>
+			    	</div>
+		    	</div>
+			    <div class="row">
+			    	<div class="col-xl-12 col-md-12 col-sm-12">
+			    		<c:if test="${fn:length(URLsharedEventMB.evento.atividades) > 0}">
+					 		<h3 class="text-center">Atividades:</h3>
+						</c:if>
+					</div>
+		    	</div>
+		    	<div class="row mb-3">
+		    	<c:forEach var="ativ" items="#{URLsharedEventMB.evento.atividades}" step="1" begin="0">
+		    		<div class="col-xd-6 col-md-6 col-sm-12 mt-4">
+	                	<div class="card no-border-rcf shadow">
+	                    	<div class="card-header no-border-rcf">
+	                           <strong>Atividade:</strong> #{ativ.nome}
+	                        </div>
+	                        <div class="card-body no-border-rcf">
+	                           <ul class="list-group first-init-reply ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+						            <li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Descrição:</strong> #{ativ.detalhes}</li>
+									<li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf"><strong>Vagas:</strong> #{ativ.vagas - ativ.qtdInscrito} de #{ativ.vagas}</li>
+								</ul>
+	                         </div>
+	                         
+	                         <c:choose>
+		             			<c:when test="${fn:length(ativ.usuarioAtividade) > 0}">
+		             				<div class="card-header no-border-rcf">
+										 <strong>Inscritos:</strong>
+									  </div>
+									  <div class="card-body no-border-rcf">
+										 <c:forEach var="insc" items="#{ativ.usuarioAtividade}" step="1" begin="0">
+										   <div class="row">
+												<ul class="list-group ui-padding-right-0-rcf ui-padding-left-0-rcf mb-2">
+											       <li class="list-group-item no-border-rcf ui-padding-top-bottom-0-15-rcf ui-padding-right-0-rcf ui-padding-left-0-rcf">
+											      		<p:commandButton immediate="true"
+															icon="ui-icon-search" title="Consultar"
+															actionListener="#{URLsharedEventMB.doConsultaUsuario(insc.usuario)}" update="formModalConsUsuario"
+															process="@this" oncomplete="openModal('modalConsUsuario')" styleClass="ui-icon-button-rcf mx-2">
+														</p:commandButton>
+														#{insc.usuario.nome}
+													</li>
+												</ul>
+											</div>
+										  </c:forEach>
+										</div>
+			                        	<div class="card-footer no-border-rcf text-muted">
+			                           		#{0 > ativ.qtdDifTemp ? '' : ativ.qtdDifTemp} #{ativ.tpDifTemp eq 'dias' ? 'dias' : (ativ.tpDifTemp eq 'horas' ? 'horas' : (ativ.qtdDifTemp eq 0 ? 'Pouco tempo' : 'minutos'))} atrás
+			                        	</div>
+		             			
+		             			</c:when>
+		             			<c:otherwise>
+		             				<div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+										Nenhum Inscrito nessa Atividade.
+									</div>
+		             			</c:otherwise>
+		             		</c:choose>
+	                     	</div>
+	                  </div>
+	             </c:forEach>
+	             </div>
+	             
+	             
+		    </h:form>
+		    <!-- modal consulta Usuario -->
+	             <div class="modal fade" id="modalConsUsuario" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formModalConsUsuario">
+									<div class="modal-header bg-light">
+										<div class="col-md-12 col-lg-12">
+										   <ul class="list-group first-init-reply">
+											  <li class="list-group-item list-group-item-ajust-rcf bg-light">
+												<h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
+											  </li>
+										   </ul>
+											
+										</div>
+									</div>
+									<div class="modal-body">
+										<div class="row">
+											<div class="col-sm-4 col-md-4 col-lg-2 col-small-4-rcf ui-padding-right-0-rcf">
+												<h:graphicImage library="perfil" name="#{URLsharedEventMB.usuario.avatar}" styleClass="avatar img-circle img-thumbnail" />
+											</div>
+											<div class="col-sm-8 col-md-8 col-lg-10 col-small-8-rcf ui-padding-left-0-rcf">
+												<ul class="list-group first-init-reply">
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>Nome:</strong> #{URLsharedEventMB.usuario.nome}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>Contato:</strong> #{URLsharedEventMB.usuario.email}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.telefone eq null ? 'Sem contato de Telefone' : (URLsharedEventMB.usuario.telefone eq '' ? 'Sem contato de Telefone' : 'Telefone:')}</strong> #{URLsharedEventMB.usuario.telefone eq null ? '' : (URLsharedEventMB.usuario.telefone eq '' ? '' : URLsharedEventMB.usuario.telefone)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.celular eq null ? 'Sem contato de Celular' : (URLsharedEventMB.usuario.celular eq '' ? 'Sem contato de Celular' : 'Celular:')}</strong> #{URLsharedEventMB.usuario.celular eq null ? '' : (URLsharedEventMB.usuario.celular eq '' ? '' : URLsharedEventMB.usuario.celular)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.estado eq null ? 'Sem informação de Estado' : (URLsharedEventMB.usuario.estado eq '' ? 'Sem informação de Estado' : 'Estado:')}</strong> #{URLsharedEventMB.usuario.estado eq null ? '' : (URLsharedEventMB.usuario.estado eq '' ? '' : URLsharedEventMB.usuario.estado)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{URLsharedEventMB.usuario.cidade eq null ? 'Sem informação de Cidade' : (URLsharedEventMB.usuario.cidade eq '' ? 'Sem informação de Cidade' : 'Cidade:')}</strong> #{URLsharedEventMB.usuario.cidade eq null ? '' : (URLsharedEventMB.usuario.cidade eq '' ? '' : URLsharedEventMB.usuario.cidade)}</li>
+												</ul>
+											 </div>
+										</div>
+									</div>
+						        </h:form>
+						        <div class="modal-footer">
+						            <div class="d-flex align-items-end flex-column">
+								        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="closeModal('modalConsUsuario')">Fechar</button>
+								    </div>
+								</div>
+						      </div>
+						   </div>
+						</div>
+	    </div>
+	</h:body>
+</html>

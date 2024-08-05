@@ -1,0 +1,238 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:pt="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	template="/WEB-INF/template/layoutV3.xhtml">
+	<ui:define name="contentV3">
+		<ul class="nav nav-tab">
+	         <li class="nav-tab-item active">
+	            <a data-tab="tab-1" data-toggle="pill" class="nav-tab-link nav-link tab active" aria-current="page" href="#inscritos">Instritos</a>
+	         </li>
+	         <li class="nav-tab-item">
+	            <a data-tab="tab-2" data-toggle="pill" class="nav-tab-link nav-link tab" href="#minhasinscricoes">Minhas</a>
+	         </li>
+      	</ul>
+		<div class="tab-content py-4">
+	        <div id="inscritos" class="tab-pane active">
+	         	<div class="form-group">
+     	 		  	<h3 class="">Inscritos</h3>
+     	 		 </div>
+                 <h:form id="formtblinsc">
+                 	<div class="${fn:length(usuarioAtividadeMB.usuAtiv) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+                 	<c:choose>
+		             <c:when test="${fn:length(usuarioAtividadeMB.usuAtiv) > 0}">
+						<div class="row">
+								<c:forEach var="insc" items="#{usuarioAtividadeMB.usuAtiv}" step="1" begin="0">
+									<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+										<div class="card no-border-rcf shadow ui-card-rcf">
+											<div class="row">
+												<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<p:commandButton immediate="true"
+															icon="ui-icon-search" title="Consultar"
+															actionListener="#{usuarioAtividadeMB.doConsultaAtiv(insc.atividade)}" update=":formHtmlModal"
+															process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf mx-2">
+													</p:commandButton>
+													#{insc.atividade.nome}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Inscrito" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<p:commandButton immediate="true"
+															icon="ui-icon-search" title="Consultar"
+															actionListener="#{usuarioAtividadeMB.doConsultaUsuario(insc.usuario)}" update="formModalConsUsuario"
+															process="@this" oncomplete="openModal('modalConsUsuario')" styleClass="ui-icon-button-rcf mx-2">
+													</p:commandButton>
+													#{insc.usuario.nome}
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Status" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<span class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}">#{insc.status}</span>
+												</div>
+											</div>
+											<div class="row">
+												<div data-label="Gerenciar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+													<p:commandButton immediate="true"
+														icon="ui-icon-check" title="Aprovar" disabled="#{insc.status eq 'Aprovado' ? 'true' : (insc.status eq 'Pendente' ? 'false' : 'false')}"
+														actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Aprovado'})}" update=":formtblinsc"
+														process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+													</p:commandButton>
+						                           	<p:commandButton immediate="true"
+														icon="ui-icon-closethick" title="Reprovar" disabled="#{insc.status eq 'Aprovado' ? 'false' : (insc.status eq 'Pendente' ? 'false' : 'true')}"
+														actionListener="#{usuarioAtividadeMB.doEdit({'usuAtiv': insc, 'status': 'Reprovado'})}" update=":formtblinsc"
+														process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+													</p:commandButton>
+												</div>
+											</div>
+										</div>
+									</div>
+								</c:forEach>
+							</div>
+		              </c:when>
+		              <c:otherwise>
+		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+							Não existe nenhum 'Inscrito' nas Atividades dos seus Eventos, divulgue seus Eventos para que as pessoas se 'Inscrevam'.
+						</div>
+				      </c:otherwise>
+					</c:choose>
+                  	</div>
+                  </h:form>
+                  
+	         
+	        </div>
+         	<div id="minhasinscricoes" class="tab-pane">
+	         	<div class="form-group">
+     	 		  	<h3 class="">Minhas Inscrições</h3>
+     	 		 </div> 	
+     	 		 <h:form id="formtblmyinsc">
+     	 		 	<div class="${fn:length(usuarioAtividadeMB.myInscricoes) > 0 ? '' : 'd-flex justify-content-center align-items-center'}">
+     	 		 	<c:choose>
+		             <c:when test="${fn:length(usuarioAtividadeMB.myInscricoes) > 0}">
+						<div class="row">
+							<c:forEach var="insc" items="#{usuarioAtividadeMB.myInscricoes}" step="1" begin="0">
+								<div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 mt-4">
+									<div class="card no-border-rcf shadow ui-card-rcf">
+										<div class="row">
+											<div data-label="Atividade" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<p:commandButton immediate="true"
+														icon="ui-icon-search" title="Consultar"
+														actionListener="#{usuarioAtividadeMB.doConsultaAtiv(insc.atividade)}" update=":formHtmlModal"
+														process="@this" oncomplete="openModal('modalConsAtividade')" styleClass="ui-icon-button-rcf mx-2">
+												</p:commandButton>
+												#{insc.atividade.nome}
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Status" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<span class="#{insc.status eq 'Aprovado' ? 'text-primary' : (insc.status eq 'Reprovado' ? 'text-danger' : 'text-warning')}">#{insc.status}</span>
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Tipo" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<span class="#{insc.atividade.organizacao eq 'Gerencia' ? 'text-success' : ''}">#{insc.atividade.organizacao}</span>
+											</div>
+										</div>
+										<div class="row">
+											<div data-label="Gerenciar" class="col-sm-12 col-small-12-rcf ui-card-conteudo-rcf text-truncate">
+												<c:choose>
+		            	 							<c:when test="#{insc.atividade.organizacao eq 'Comum'}">
+														<p:commandButton immediate="true"
+															icon="ui-icon-closethick" title="Desistir"
+															actionListener="#{usuarioAtividadeMB.doDelete(insc)}" update=":formtblmyinsc"
+															process="@this" oncomplete="" styleClass="ui-icon-button-rcf">
+														</p:commandButton>
+													</c:when>
+													<c:otherwise>
+														Não permitido
+													</c:otherwise>
+												</c:choose>
+											</div>
+										</div>
+									</div>
+								</div>
+							</c:forEach>
+						</div>
+		              </c:when>
+		              <c:otherwise>
+		                <div class="alert alert-warning d-flex justify-content-center align-items-center" role="alert">
+							Você não está inscrito em nenhuma Atividade de nenhum Evento, vá para o menu de Eventos e descubra novos eventos de outros usuários.
+						</div>
+				      </c:otherwise>
+					</c:choose>
+     	 		  	</div>
+                  </h:form>
+	         	
+	        </div>
+	        <p:dialog widgetVar="status" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+                        <p:graphicImage name="ajaxloader.gif" library="images" />
+                     </p:dialog>
+                     <p:ajaxStatus onstart="PF('status').show()"
+                        onsuccess="PF('status').hide()" />
+             
+             <!-- modal consulta atividade -->
+					 <div class="modal fade" id="modalConsAtividade" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+					   <div class="modal-dialog modal-xl" role="document">
+					      <div class="modal-content">
+					      	<h:form id="formHtmlModal">
+					         <div class="modal-header bg-light">
+					         	<div class="col-md-12 col-lg-12">
+						           <ul class="list-group first-init-reply">
+						              <li class="list-group-item list-group-item-ajust-rcf bg-light">
+						               	<h5 class="modal-title" id="exampleModalLabel">Atividade: #{usuarioAtividadeMB.atividade.nome}</h5>
+						              </li>
+						           </ul>
+						            
+					            </div>
+					         </div>
+					         <div class="modal-body">
+					            <div class="col-md-12 col-lg-12">
+					              	<ul class="list-group first-init-reply">
+					              		<li class="list-group-item list-group-item-ajust-rcf"><strong>Evento:</strong> #{usuarioAtividadeMB.atividade.evento.titulo}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Detalhes da Atividade:</strong> #{usuarioAtividadeMB.atividade.detalhes}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Começa:</strong> #{usuarioAtividadeMB.formatarDataFromTela({'data': usuarioAtividadeMB.atividade.dataInicio, 'formato': 'dd/MM'})} às #{usuarioAtividadeMB.formatarDataFromTela({'data': usuarioAtividadeMB.atividade.dataInicio, 'formato': 'HH:mm'})}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Termina:</strong> #{usuarioAtividadeMB.formatarDataFromTela({'data': usuarioAtividadeMB.atividade.dataFim, 'formato': 'dd/MM'})} às #{usuarioAtividadeMB.formatarDataFromTela({'data': usuarioAtividadeMB.atividade.dataFim, 'formato': 'HH:mm'})}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Preço:</strong> #{usuarioAtividadeMB.atividade.preco}</li>
+										<li class="list-group-item list-group-item-ajust-rcf"><strong>Vagas:</strong> #{usuarioAtividadeMB.atividade.vagas - usuarioAtividadeMB.atividade.qtdInscrito} de #{usuarioAtividadeMB.atividade.vagas}</li>
+									</ul>
+					             </div>
+					         </div>
+					         </h:form>
+					         <div class="modal-footer bg-light">
+					             <div class="d-flex align-items-end flex-column">
+							         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+							     </div>
+							 </div>
+					      </div>
+					   </div>
+					</div>
+						
+						<!-- modal consulta Usuario -->
+					 <div class="modal fade" id="modalConsUsuario" tabindex="-1" role="dialog" aria-labelledby="confirmDel" aria-hidden="true">
+						   <div class="modal-dialog modal-xl" role="document">
+						      <div class="modal-content">
+						      	<h:form id="formModalConsUsuario">
+									<div class="modal-header bg-light">
+										<div class="col-md-12 col-lg-12">
+										   <ul class="list-group first-init-reply">
+											  <li class="list-group-item list-group-item-ajust-rcf bg-light">
+												<h5 class="modal-title" id="exampleModalLabel">Usuario</h5>
+											  </li>
+										   </ul>
+											
+										</div>
+									</div>
+									<div class="modal-body">
+										<div class="row">
+											<div class="col-sm-4 col-md-4 col-lg-2 col-small-4-rcf ui-padding-right-0-rcf">
+												<h:graphicImage library="perfil" name="#{usuarioAtividadeMB.usuario.avatar}" styleClass="avatar img-circle img-thumbnail" />
+											</div>
+											<div class="col-sm-8 col-md-8 col-lg-10 col-small-8-rcf ui-padding-left-0-rcf">
+												<ul class="list-group first-init-reply">
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>Nome:</strong> #{usuarioAtividadeMB.usuario.nome}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>Contato:</strong> #{usuarioAtividadeMB.usuario.email}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{usuarioAtividadeMB.usuario.telefone eq null ? 'Sem contato de Telefone' : (usuarioAtividadeMB.usuario.telefone eq '' ? 'Sem contato de Telefone' : 'Telefone:')}</strong> #{usuarioAtividadeMB.usuario.telefone eq null ? '' : (usuarioAtividadeMB.usuario.telefone eq '' ? '' : usuarioAtividadeMB.usuario.telefone)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{usuarioAtividadeMB.usuario.celular eq null ? 'Sem contato de Celular' : (usuarioAtividadeMB.usuario.celular eq '' ? 'Sem contato de Celular' : 'Celular:')}</strong> #{usuarioAtividadeMB.usuario.celular eq null ? '' : (usuarioAtividadeMB.usuario.celular eq '' ? '' : usuarioAtividadeMB.usuario.celular)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{usuarioAtividadeMB.usuario.estado eq null ? 'Sem informação de Estado' : (usuarioAtividadeMB.usuario.estado eq '' ? 'Sem informação de Estado' : 'Estado:')}</strong> #{usuarioAtividadeMB.usuario.estado eq null ? '' : (usuarioAtividadeMB.usuario.estado eq '' ? '' : usuarioAtividadeMB.usuario.estado)}</li>
+													<li class="list-group-item list-group-item-ajust-rcf"><strong>#{usuarioAtividadeMB.usuario.cidade eq null ? 'Sem informação de Cidade' : (usuarioAtividadeMB.usuario.cidade eq '' ? 'Sem informação de Cidade' : 'Cidade:')}</strong> #{usuarioAtividadeMB.usuario.cidade eq null ? '' : (usuarioAtividadeMB.usuario.cidade eq '' ? '' : usuarioAtividadeMB.usuario.cidade)}</li>
+												</ul>
+											 </div>
+										</div>
+									</div>
+						        </h:form>
+						        <div class="modal-footer">
+						            <div class="d-flex align-items-end flex-column">
+								        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+								    </div>
+								</div>
+						      </div>
+						   </div>
+						</div>
+             
+             
+             
+	    </div>
+	</ui:define>
+</ui:composition>
